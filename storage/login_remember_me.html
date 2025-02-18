@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form>
+        <label for="username">用户名</label>
+        <input type="username" id="username">
+        <label for="password">密码</label>
+        <input type="password" id="password">
+        <input type="checkbox">
+        <label for="rememberMe" id="rememberMe">记住我</label>
+        <input type="submit" value="登录">
+    </form>
+
+    <script>
+        const username = document.querySelector('input[type="username"]');
+        const checkbox = document.querySelector('input[type="checkbox"]');
+        const submit = document.querySelector('input[type="submit"]');
+        let array = document.cookie.split(';').map(cookie => cookie.split('='));
+        let cookie = {};
+        for(let i=0; i<array.length; i++){
+            let name = array[i][0];
+            let value = array[i][1];
+            cookie[name] = decodeURIComponent(value);
+        }
+        // 如果cookie有值，填写用户名和勾选复选框
+        if(document.cookie){
+            username.value = cookie.username;
+            checkbox.checked = true;
+        }
+        // console.log(cookie);
+        submit.addEventListener('click', e => {
+            if(checkbox.checked && username.value != ''){
+                let key = 'username';
+                let value = encodeURIComponent(username.value); // encodeURLComponent:保证它不包含任何逗号、分号或空格
+                let twoDays = 2*24*60*60;
+                document.cookie = `${key}=${value}; max-age=${twoDays}`;
+                alert(document.cookie);
+            }
+            e.preventDefault();
+        })
+    </script>
+</body>
+</html>
