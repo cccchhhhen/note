@@ -79,16 +79,43 @@ Cookie 的生命周期可以通过两种方式定义：
 ### 增
 ```js
 localStorage.setItem("key", "value");
+localStorage.key="value";
+localStorage["key"]="value";
 ```
 
 ### 删
 ```js
 localStorage.removeItem("key");
+delete localStorage.key;
 // 移除所有
 localStorage.clear();
 ```
 
 ### 查
 ```js
-let value =calStorage.getItem("key")
+localStorage.getItem("key")
+localStorage["key"]
+localStorage.key
 ```
+
+# 同源窗口
+
+### 什么是同源窗口？
+>同源窗口是指具有相同 协议（Protocol）、域名（Domain） 和 端口（Port） 的窗口或标签页。同源策略（Same-Origin Policy）是浏览器的一种安全机制，用于限制不同源的窗口或页面之间的交互
+
+### 为什么不同浏览器不算同源窗口？
+1. **浏览器隔离：**  
+    * 不同浏览器（如 Chrome、Firefox、Edge）是完全独立的应用程序，它们之间的数据（如localStorage、sessionStorage、cookies 等）是隔离的。
+即使在同一台电脑上，不同浏览器之间无法共享数据或直接通信。
+2. **同源策略的限制：**  
+    * 同源策略仅适用于同一浏览器内的不同窗口或标签页。即使两个窗口打开的是同一个网站，如果它们位于不同的浏览器中，它们也不被视为同源窗口。
+3. **数据隔离：**  
+    * 不同浏览器的存储机制是独立的。例如：
+        - Chrome 的 localStorage 和 Firefox 的 localStorage 是完全隔离的。
+        - Chrome 的 cookies 和 Edge 的 cookies 也是独立的。
+        
+**总结**
+* **同一电脑的不同浏览器不算同源窗口**，因为它们是独立的应用程序，数据完全隔离。
+* **同源窗口** 是指 同一浏览器 中具有相同协议、域名和端口的窗口或标签页。
+
+如果需要在不同浏览器之间共享数据，通常需要通过服务器（如后端 API）或外部存储（如数据库）来实现
