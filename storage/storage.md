@@ -70,11 +70,18 @@ Cookie 的生命周期可以通过两种方式定义：
 * **会话期 Cookie** 会在当前的会话结束之后删除。浏览器定义了“当前会话”结束的时间，一些浏览器重启时会使用会话恢复。这可能导致会话 cookie 无限延长。
 * **持久性 Cookie** 在过期时间（**Expires**）指定的日期或有效期（**Max-Age**）指定的一段时间后被删除。
 
-# localStorage
+# Web Storage API
+
+* sessionStorage 为每一个给定的源（given origin）维持一个独立的存储区域，该存储区域在页面会话期间可用（即只要浏览器处于打开状态，包括页面重新加载和恢复）。
+* localStorage 同样的功能，但是在浏览器关闭，然后重新打开后数据仍然存在。
+
+## Window.localStorage
 
 5M
 
->localStorage 中的键值对总是以字符串的形式存储。 (需要注意，和 js 对象相比，键值对总是以字符串的形式存储意味着数值类型会自动转化为字符串类型)
+>localStorage 中的键值对总是以字符串的形式存储。 (需要注意，和 js 对象相比，键值对总是以**字符串**的形式存储意味着数值类型会自动转化为字符串类型)
+
+**注：** 如果值要存储object类型，要通过`JSON.stringfy`转换成string类型；使用时通过`JSON.parse`转化成object类型
 
 ### 增
 ```js
@@ -98,7 +105,19 @@ localStorage["key"]
 localStorage.key
 ```
 
-# 同源窗口
+
+
+## Window.sessionStorage
+>sessionStorage 属性允许你访问一个，对应当前源的 session Storage 对象。它与 localStorage 相似，不同之处在于 localStorage 里面存储的数据没有过期时间设置，而存储在 sessionStorage 里面的数据在页面会话结束时会被清除。
+
+* 页面会话在浏览器打开期间一直保持，并且重新加载或恢复页面仍会保持原来的页面会话。
+* 在新标签或窗口打开一个页面时会复制顶级浏览会话的上下文作为新会话的上下文，这点和 session cookie 的运行方式不同。
+* 打开多个相同的 URL 的 Tabs 页面，会创建各自的 sessionStorage。
+* 关闭对应浏览器标签或窗口，会清除对应的 sessionStorage。
+
+
+
+## 同源窗口
 
 ### 什么是同源窗口？
 >同源窗口是指具有相同 协议（Protocol）、域名（Domain） 和 端口（Port） 的窗口或标签页。同源策略（Same-Origin Policy）是浏览器的一种安全机制，用于限制不同源的窗口或页面之间的交互

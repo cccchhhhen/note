@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <input type="search">
+    <button>search</button>
+    <section><ul class="history"></ul></section>
+
+    <script>
+        const input = document.querySelector('input[type="search"]');
+        const button = document.querySelector('button');
+        const history = document.querySelector('.history');
+
+        const pre = 'searchHistory'; 
+        renderHistory();
+        
+        // 点击搜索存储搜索记录
+        button.addEventListener('click',() => {
+            if(input.value){
+                let key = new Date().valueOf();
+                key = pre + key; // 历史记录前面加pre以区别其他的localStorage key
+                let value = input.value;
+                sessionStorage.setItem(key, value);
+                input.value = '';
+                showHistory(key)
+            }
+        })
+        // 添加新的li元素
+        function showHistory(key){
+            let li = document.createElement('li');
+            let liText = document.createTextNode(sessionStorage.getItem(key));
+            li.appendChild(liText);
+            history.appendChild(li);
+            let close = document.createElement('span');
+            close.appendChild(document.createTextNode('×'));
+            li.append(close);
+            close.addEventListener('click', () => {
+                sessionStorage.removeItem(key);
+                li.parentElement.removeChild(li);
+            })
+        }
+        // 渲染历史记录
+        function renderHistory(){
+            if(sessionStorage.length > 0){
+                for(let i=0; i<sessionStorage.length; i++){
+                    let key = sessionStorage.key(i);
+                    if(key.slice(0,pre.length) === pre){
+                        showHistory(key);
+                    }
+                }
+            }
+        }
+        // localStorage.clear(); // 清空localStorage
+    </script>
+</body>
+</html>

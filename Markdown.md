@@ -1,6 +1,7 @@
 # Markdwon
 
 [basic_syntax](https://www.markdownguide.org/basic-syntax/ "Markdown指南")
+
 ## 1.为什么要用Markdown写文档?
 
 **首先**什么是Markdown？
@@ -99,7 +100,7 @@ ___斜体又加粗___
 
 1. list1
    * list11
-  
+
 #### 3.4.4 勾选框
 * [ ] 未勾选
 * [x] 已勾选   
@@ -148,11 +149,11 @@ ___斜体又加粗___
 1. [链接1](https://www.baidu.com/ "这是百度链接")  
     对应的HTML代码：&lt;a href="超链接地址" title="超链接title"&gt;超链接显示名</a>
 2. [链接2][a]  
-   [a]: https://www.baidu.com/  
+   [a]: https://www.baidu.com/
    打开[百度](a)
 
     **网址和Email地址**  
-    
+   
     使用尖括号可以很方便地把 URL 或者 email 地址变成可点击的链接
     https://www.baidu.com/  
     <1366190531@qq.com>
@@ -212,7 +213,7 @@ $$
 
 #### 3.12.2特殊数学符号
  百度
- 
+
 #### 3.12.3分数
 分数使用\farc来表示  
 $\frac{分子}{分母}$
@@ -240,7 +241,12 @@ $$\lim_{x\rightarrow+\infty}\frac{x}{x+3}$$
 点乘 $\cdot$  
 累加 同样用上下标标注即可 $\sum$  
 
+### 3.13生成目录
+
+输入`[toc]`，然后输入回车，就可以自动生成目录列表（table of content）
+
 ### 转义字符
+
 反斜杆\
 
 特殊字符自动转义<(\&lt;)和&(\&amp;) 

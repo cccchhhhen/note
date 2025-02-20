@@ -35,4 +35,6 @@ error: failed to push some refs to 'https://github.com/cccchhhhen/html_css_js_pr
     * 如果远程仓库已经有 main 分支，确保本地分支与远程分支同步  
     `git pull origin main`
     
-    
+window
+通过`git commit`进入编辑器，通过`:wq`退出
+
