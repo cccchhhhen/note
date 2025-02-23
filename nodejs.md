@@ -71,7 +71,7 @@ console.log(result);
 // [ 1, 2, 3, 4, 5 ]
 ```
 
-运行止呕文件夹下会增加两个资源
+运行之后文件夹下会增加两个资源
 * `node_modules` **文件夹**存放下载的包
 * `package-lock.json` **包的锁文件**，用来锁定包的版本
 
@@ -667,7 +667,100 @@ app.use(express.static(__dirname + '/public'));
 ```
 
 > 注意事项：
-> 1. index.html文件为默认打卡idea资源
-> 2. 如果静态资源与路由规则同事匹配，谁先匹配谁就响应
+> 1. index.html文件为默认打开的资源
+> 2. 如果静态资源与路由规则同时匹配，谁先匹配谁就响应
 > 3. 路由响应动态资源，静态资源中间件响应静态资源
+
+```js
+// 在局域网中，其他设备可以通过ip:port访问到该电脑上的网页
+const express = require('express');
+
+const app = express();
+
+app.use(express.static(__dirname + '/public')); // 先被匹配到，执行index.html里面的内容 
+
+app.get('/', (req, res) => { // 后被匹配到，不执行
+
+  res.send('hello home');
+
+})
+
+app.listen(3000, () => {
+
+  console.log('服务已启动，正在监听端口3000...')
+
+})
+```
+
+##### 获取请求数据 body-parser
+
+express 可以使用 `body-parser` 包处理请求体
+
+第一步：安装
+
+```npm i body-parser```
+
+第二步：导入 body-parser 包
+
+```const bodyParser = require('body-parser');```
+
+第三步：获取中间件函数
+
+```js
+// 处理querystring 格式的请求体
+let urlParser = bodyParser.urlencoded({extended:false});
+// 处理 JSON 格式的请求体
+let jsonParser = bodyParser.json();
+```
+
+第四步：设置路由中间件，然后使用 `request.body`来获取请求体数据
+
+
+
+````js
+/**
+ * 按照要求搭建 HTTP 服务
+ * 
+ * GET   /login   显示表单网页
+ * POST  /login   获取表单中的 [用户名] 和 [密码] 
+ * getreqbodydata.js
+ */
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+
+// 解析 JSON 格式的请求体的中间件
+// const jsonParser = bodyParser.json();
+
+// 解析 querystring 格式请求体的中间件
+let urlencodedParser = bodyParser.urlencoded({extended:false});
+
+app.get('/login', (req, res) => {
+    // 响应 HTML 文件内容
+    res.sendFile(__dirname+'/getreqbodydata.html');
+});
+
+app.post('/login', urlencodedParser, (req, res) => {
+    console.log(req.body);
+    // [Object: null prototype] { username: 'admin', password: 'admin' }
+    res.send('获取表单用户名和密码');
+});
+
+app.listen(3000, () => {
+    console.log('server is running...')
+})
+
+```
+````
+
+```html
+// getreqbodydata.html
+<form action="/login" method="post"> 
+    <!-- action url 简写 会自动拼接完整url-->
+     用户名：<input type="text" name="username"><br>
+     密码：<input type="password" name="password"><br>
+     <button>登录</button>
+
+</form>
+```
 
