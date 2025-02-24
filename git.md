@@ -7,8 +7,9 @@
     
 3. 添加并提交文件：
     * 运行 `git add .` 添加所有文件（包括文件夹）。
+        - `git add *` 后可通过 `git status` 查看缓存
+        - `git add *` 后可通过 `git reset` 重置缓存区
     * 运行 `git commit -m "Initial commit"` 提交更改。
-
 4. 推送文件：
     * 运行 `git push -u origin main`（或 master）将文件推送到 GitHub。
     
