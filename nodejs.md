@@ -23,7 +23,7 @@ npm 是 node.js官方内置的包管理工具，是**必须要掌握的工具**
 ##### npm的安装
 
 node.js在安装时会 **自动安装npm**，所以如果你已经安装了node.js，可以直接使用npm  
-可以通过 `npm-v` 查看版本号测试，如果显示版本号说明安装成功，反之安装失败 
+可以通过 `npm -v` 查看版本号测试，如果显示版本号说明安装成功，反之安装失败 
 
 ##### npm基本使用
 
@@ -184,7 +184,7 @@ npm remove -g nodemon
 #### cnpm
 
 ##### cnpm 介绍
-cnpm 是一个淘宝构建的 `npmjs.com` 的完整镜像，也称为[淘宝镜像],网址[http://npmmirror.com/](http://npmmirror.com/)  
+cnpm（China Node Package Manager） 是一个淘宝构建的 `npmjs.com` 的完整镜像，也称为[淘宝镜像],网址[http://npmmirror.com/](http://npmmirror.com/)  
 cnpm 服务部署在国内 **阿里云服务器上**，可以提高包的下载速度  
 官方也提供了一个全部工具包cnpm，操作命令与npm大体相同
 
@@ -218,7 +218,7 @@ npm config set registry https://registry.npmmirror.com/
 ```
 
 ###### 工具配置
-使用 `nrm` 配置 npm 的镜像地址 `npm registry maneger`
+使用 `nrm` （npm registry maneger）配置 npm 的镜像地址 
 1. 安装 nrm  
     ```
     npm i -g nrm
@@ -235,8 +235,8 @@ npm config set registry https://registry.npmmirror.com/
     
 > 补充说明：
 > 1. **建议使用第二种方式**进行镜像配置，因为后续修改起来会比较方便
-> 2. 虽然 cnpm 可以提高速度，但是npm也可以通过淘宝镜像进行加速，所以 **npm 的使用率还是高于cnpm**
-> 3. 通过 `nrm ls` 可以查看可修改的镜像
+> 2. 虽然 cnpm 可以提高速度，但是 npm 也可以通过淘宝镜像进行加速，所以 **npm 的使用率还是高于cnpm**
+> 3. 通过 `nrm ls` 可以查看当前配置的所有镜像源
 
 
 #### yarn
@@ -265,4 +265,586 @@ yarn 官方宣称的一些特点
 | 运行命令别名 | yarn <别名>  # 不需要添加 `run`                              |
 
 > 思考题：
-> 全局安装的包不可用，yarn全局安装包的位置可以通过`yarn global bin`来查看
+> 全局安装的包不可用，yarn全局安装包的位置可以通过`yarn global bin`来查看，然后将他的路径添加到环境变量中去。
+
+##### yarn配置淘宝镜像
+可以通过如下命令配置淘宝镜像
+```
+yarn config set registry https://registry.npmmirror.com/
+```
+可以通过`yarn config list`查看yarn的配置项
+
+##### npm 和 yarn 选择
+1. 个人项目
+    如果是个人项目，**哪个工具都可以**，可以根据自己的喜好来选择
+2. 公司项目
+    如果是公司要根据项目代码来选择，可以**通过锁文件判断**项目的包管理工具
+    * npm  的锁文件为 `package-lock.json`
+    * yarn 的锁文件为 `yarn.lock`
+    
+> **包管理工具不要混着用！！**
+
+#### 管理发布包
+
+##### 创建与发布
+我们可以将自己开发的工具包发布到 npm 服务上，方便自己和其他开发者使用，操作步骤如下：
+1. 创建文件夹，并创建文件index.js，在文件中声明函数，使用 module.exports暴露
+2. npm 初始化工具包，package.json填写包的信息（包的名字是唯一的）
+3. 注册账号 [https://www.npmjs.com/signup](https://www.npmjs.com/signup)
+4. 激活账号
+5. 修改为官方的官方镜像（命令行中运行 `nrm usr npm`）
+6. 命令行下`npm login`填写相关用户信息
+7. 命令行下`npm publish`提交包
+
+##### 更新包
+后续可以对自己发布的包进行更新，操作步骤如下：
+1. 更新包中的代码
+2. 测试代码是否可用
+3. 修改 **package.json** 中的版本号
+4. 发布更新 `npm publish`
+
+##### 删除包
+执行如下命令删除包
+`npm unpublish( --force)`
+
+> 删除包需要满足一定的条件，[https://docs.npmjs.com/policies/unpublish](https://docs.npmjs.com/policies/unpublish)
+> * 你是包的作者
+> * 发布小于24小时
+> * 大于24小时后，没有其他包依赖，并且每周小于300下载量，并且只有一个维护者
+
+##### 扩展内容
+
+在很多语言中都有包管理工具，比如：
+
+| 语言       | 包管理工具          |
+| ---------- | ------------------- |
+| PHP        | composer            |
+| Python     | pip                 |
+| Java       | maven               |
+| Go         | go mod              |
+| JavaScript | npm/yarn/cnpm/other |
+| Ruby       | rubyGems            |
+
+除了编程语言领域有包管理工具之外，操作系统层面也存在包管理工具，不过这个包指的是[**软件包**]
+
+| 操作系统 | 包管理工具 | 网址                               |
+| -------- | ---------- | ---------------------------------- |
+| Centos   | yum        | https://package.debian.org/stable/ |
+| Ubuntu   | apt        | https://package.ubuntu.com/        |
+| MacOS    | homebrew   | https://brew.sh/                   |
+| Windows  | chocolatey | https://chocolatey.org/            |
+
+#### nvm
+##### 介绍
+nvm 全称 **Node Version Manager** 顾名思义它是用来管理 node 版本的工具，方便切换不同版本的Node.js
+##### 使用
+nvm 的使用与 npm 相似
+###### 下载安装
+首先下载 nvm，下载地址[https://github.com/coreybutler/nvm-windows/releases](https://github.com/coreybutler/nvm-windows/releases),选择 **nvm-setup.exe** 下载
+###### 常用命令
+
+| 命令                  | 说明                          |
+| --------------------- | ----------------------------- |
+| nvm list available    | 显示所有可以下载的Node.js版本 |
+| nvm list/nvm ls       | 显示已安装的版本              |
+| nvm install 18.12.1   | 安装18.12.1版本的Node.js      |
+| nvm install latest    | 安装最新版的Node.js           |
+| nvm uninstall 18.12.1 | 删除某个版本的Node.js         |
+| nvm use 18.12.1       | 切换18.12.1的Node.js          |
+
+
+## ExpressJS
+
+### express介绍
+express 是一个基于 Node.js 平台的极简、灵活的WEB应用开发框架，官网[https://www.expressjs.com.cn/](https://www.expressjs.com.cn/) 简单来说，express是一个封装好的工具包，封装了很多功能，便于我们开发WEB应用（HTTP服务）
+
+### express使用
+```js
+// 1.导入 express
+const express = require('express')
+// 2.创建应用对象
+const app = express();
+// 3.创建路由
+app.get('/home',(req,res) => {
+    res.end('hello express');
+})
+// 4.监听端口，启动服务
+app.listen(3000,() => {
+    console.log('服务已启动，正在监听端口3000...');
+})
+```
+
+#### express下载
+express本身是一个npm包，所以可以通过npm安装`npm i express`
+
+#### express路由
+
+**什么是路由**
+> 路由确定了应用程序如何响应客户端对特定端点的请求
+
+**路由的使用**
+> 一个路由的组成有 **请求方法**，**路径**和**回调函数**组成
+express 中提供了一系列方法，可以很方便的使用录用，使用格式如下：  
+`app.<method>(path, callback)`
+
+```js
+// 1.导入 express
+const express = require('express')
+// 2.创建应用对象
+const app = express();
+// 3.创建路由
+app.get('/',(req,res) => {
+    res.end('hello');  // localhost:3000
+})
+app.get('/home',(req,res) => {
+    res.end('hello express'); // localhost:3000/home
+})
+// post <form method="post" action="..."><button>submit</button></form>
+app.post('/login',(req,res) => {
+    res.end('login login'); 
+})
+// 匹配所有方法 get post
+app.all('/test',(req,res) => {
+    res.end('test test');
+})
+// 404 响应 上面都匹配不到时
+app.all('*',(req,res) => {
+    res.end('404 not found');
+})
+// 4.监听端口，启动服务
+app.listen(3000,() => {
+    console.log('服务已启动，正在监听端口3000...');
+})
+```
+
+**获取请求参数**
+express 框架封装了一些 API 来方便获取请求报文中的数据，并且兼容原生HTTP模块的获取方式
+```js
+// 1.导入 express
+const express = require('express')
+// 2.创建应用对象
+const app = express();
+// 3.创建路由
+// http://127.0.0.1:3000/request
+app.get('/request',(req,res) => {
+
+    // 原生操作
+    console.log(req.method); // GET
+    console.log(req.url); // /request?a=1&b=2
+    console.log(req.httpVersion); //1.1 
+    console.log(req.headers);
+
+    // exporess 操作
+    console.log(req.path); // /request
+    console.log(req.query); //{ a: '1', b: '2' }
+
+    // 获取 ip
+    console.log(req.ip); //(localhost) ::1 ->ipv6 环回地址;(127.0.0.1)::ffff:127.0.0.1
+
+    // 获取请求头
+    console.log(req.get('host')); // 127.0.0.1:3000
+    res.end('hello');  // localhost:3000
+})
+
+// 4.监听端口，启动服务
+app.listen(3000,() => {
+    console.log('服务已启动，正在监听端口3000...');
+})
+```
+
+##### 获取路由参数
+路由参数指的是 URL 路径中的参数（数据）
+```js
+app.get('/:id.html',(req,res) => {
+    // 获取 URL 路由参数
+    console.log(req.params.id);
+    // http://127.0.0.1:3000/789.html -> 789
+    // http://127.0.0.1:3000/123.html -> 123
+    res.setHeader('content-type','text/html;charset=utf-8');
+    res.end('hello'); 
+})
+```
+
+##### 路由参数练习
+路由结构：`/singer/1.html`，显示歌手的**姓名**和**图片**
+```js
+// 导入 express
+const express = require('express')
+// 导入singer.json文件
+const {singers} = require('./singer.json');
+// 创建应用对象
+const app = express();
+// 创建路由
+app.get('/singer/:id.html',(req,res) => {
+    // 获取 URL 路由参数
+    let {id} = req.params
+    console.log(id);
+    let result = singers.find(s => {
+        if(Number(id) === s.id){
+            return true;
+        }
+    });
+    if(!result){
+        res.statusCode = 404;
+        res.end(`<h1>404 NOT FOUND</h1>`);
+    }
+    res.setHeader('content-type','text/html;charset=utf-8');
+    res.end(
+        `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Document</title>
+        </head>
+        <body>
+            <p>${result.singer_name}</p>
+            <img src="${result.singer_pic}" alt="pic">
+        </body>
+        </html>`); 
+})
+
+// 监听端口，启动服务
+app.listen(3000,() => {
+    console.log('服务已启动，正在监听端口3000...');
+})
+
+```
+```json
+{
+    "singers":[
+        {
+            "singer_name":"周杰伦",
+            "singer_pic":"https://y.gtimg.cn/music/photo_new/T001R150x150M0000025NhlN2yWrP4.webp",
+            "other_name":"Jay Chou",
+            "singer_id":4558,
+            "id":1
+        },
+        {
+            "singer_name":"林俊杰",
+            "singer_pic":"https://y.gtimg.cn/music/photo_new/T001R150x150M000001BLpXF2DyJe2.webp",
+            "other_name":"JJ Lin",
+            "singer_id":4286,
+            "id":2
+        },
+        {
+            "singer_name":"G.E.M.邓紫棋",
+            "singer_pic":"https://y.gtimg.cn/music/photo_new/T001R150x150M000001fNHEf1SFEFN.webp",
+            "other_name":"Gloria Tang",
+            "singer_id":13948,
+            "id":3
+        }
+    ]
+}
+```
+
+#### express响应设置
+express 框架封装了一些API来方便给客户端相应数据，并且兼容原生HTTP模块的获取方式
+```js
+app.get('/response',(req,res) => {
+    // 原生响应
+    res.statusCode = 200;
+    res.statusMessage = 'love';
+    res.setHeader('xxx','yyy');
+    res.write('hello express ');
+    res.end('response');
+    // express 响应
+    res.status(500);
+    res.set('aaa','bbb');
+    res.send('你好 Express');
+    // 或者
+    res.status(500).set('abc','def').send('it is ok');
+    
+    // 其他响应设置
+    
+    // 跳转响应
+    res.redirect('https://baidu.com');
+    // 下载响应
+    res.download(__dirname + '/singer.json');
+    // JSON 响应
+    res.json({
+        name:'chen',
+        slogon:'nice'
+    })
+    // 响应文件内容
+    res.sendFile(__dirname + '/login.html'); // path.resolve()
+});
+
+
+```
+
+#### expres 中间件
+
+##### 什么是中间件
+**中间件（Middleware）本质是一个回调函数**
+**中间件函数**可以像路由回调一样访问**请求对象（request）、响应对象（response）**
+
+##### 中间件的作用
+**中间件的作用**就是**使用函数封装公共操作，简化代码**
+
+##### 中间件的类型
+
+* 全局中间件（进站口）
+* 路由中间件（检票口）
+
+###### 定义全局中间件
+**每一个请求**到达服务端之后**都会执行全局中间件函数**
+
+**全局中间件例子**
+```js
+/**
+ * 记录每个请求的 url 和 IP 地址
+ */
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const app = express();
+function recordMiddleware(req, res, next){
+    // 获取 url 和 ip
+    let {url,ip} = req;
+    let filePath = path.resolve(__dirname,'./memory.log');
+    // 将信息保存在 memory.log中
+    fs.appendFileSync(filePath,`${url} ${ip}\r\n`);
+    // 调用 next
+    next();
+}
+app.use(recordMiddleware);
+app.get('/admin',(req,res) => {
+    res.send('hello admin');   
+});
+
+app.get('/test',(req,res) => {
+    res.send('hello test');   
+});
+
+app.listen(3000,() => { 
+    console.log('服务器已打开，端口3000正在监听中...');
+})
+```
+
+memory.log
+```log
+/test ::ffff:127.0.0.1
+/admin ::ffff:127.0.0.1
+```
+**路由中间件例子**
+```js
+/**
+ * 针对 /admin /setting 的请求，要求 URL 携带 code=521 参数，如未携带提示 [暗号错误]
+ */
+
+const express = require('express');
+const app = express();
+// 声明中间件
+let checkCodeMiddleware=(req, res, next) => {
+    if(req.query.code === '521'){
+        next();
+    }
+    else{
+        res.send('暗号错误');
+    }
+}
+// app.use(checkCodeMiddleware);
+app.get('/home',(req,res) => {
+    res.send('hello home');
+});
+app.get('/setting',checkCodeMiddleware,(req,res) => {
+    res.send('hello setting');
+});
+app.get('/admin',checkCodeMiddleware,(req,res) => {
+    res.send('hello admin');
+});
+
+app.listen(3000,() => {
+    console.log('服务已启动，正在监听端口3000...');
+})
+```
+
+##### 静态资源中间件
+```js
+// 静态资源中间件设置
+app.use(express.static(__dirname + '/public'));
+```
+
+> 注意事项：
+> 1. index.html文件为默认打卡idea资源
+> 2. 如果静态资源与路由规则同事匹配，谁先匹配谁就响应
+> 3. 路由响应动态资源，静态资源中间件响应静态资源
+
+##### 防盗链（未完成）
+
+##### 路由模块化
+
+路由模块化.js
+
+```js
+// 导入 express
+const express = require('express');
+const homeRouter = require('./routes/homeRouter');
+const adminRouter = require('./routes/adminRouter');
+// 创建应用对象
+const app = express();
+// 设置
+app.use(homeRouter);
+app.use(adminRouter);
+
+app.all('*', (req, res) => {
+  res.send('<h3>404 NOT FOUND</h1>');
+});
+
+app.listen(3000, () => {
+  console.log('server is running');
+})
+```
+
+routes homeRouter.js
+
+```js
+// 1.导入 express
+const express = require('express');
+// 创建路由对象
+const router = express.Router();
+// 创建路由规则
+// 创建路由
+router.get('/home', (req, res) => {
+  res.send('前台首页');
+});
+// 创建路由
+router.get('/search', (req, res) => {
+  res.send('内容搜索');
+});
+module.exports = router;
+```
+
+routes adminRouter.js
+
+```js
+// 1.导入 express
+const express = require('express');
+// 创建路由对象
+const router = express.Router();
+
+// 创建路由规则
+// 创建路由
+router.get('/admin', (req, res) => {
+  res.send('后台首页');
+});
+// 创建路由
+router.get('/setting', (req, res) => {
+  res.send('设置页面');
+});
+
+module.exports = router;
+```
+
+##### EJS模板引擎
+
+###### 什么是模板引擎
+
+模板引擎是分离**用户界面和业务数据**的一种技术
+
+###### 什么是EJS
+
+EJS是一个高效的Javascript的模板引擎
+
+官网：https://ejs.co/
+
+中文站: https://ejs.bootcss.com/
+
+EJS初体验
+
+下载安装EJS
+
+`npm i ejs --save`
+
+```js
+// 1. 安装 EJS
+// 2. 导入 EJS
+const ejs = require('ejs');
+const fs = require('fs');
+
+let str = fs.readFileSync(__dirname+'/EJS_01.html').toString();
+// console.log(data);
+// 字符串
+let china = '中国';
+let weather = '今天是晴天~';
+// let str = '我爱你 <%= china %>';
+
+// 使用 ejs 渲染
+// let result = ejs.render(str, {china: china});
+let result = ejs.render(str, {china: china, weather});
+
+console.log(result);
+```
+
+```html
+<!-- <h1>我爱你 <%= china %></h1> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>我爱你 <%= china %></h1>
+    <p><%= weather %></p>
+</body>
+</html>
+```
+
+###### EJS列表渲染
+
+EJS列表渲染.js
+
+```js
+const xiyou = ['唐僧', '孙悟空', '猪八戒', '沙僧'];
+const ejs = require('ejs');
+// 原生 js 实现
+let str = '<ul>';
+xiyou.forEach(elem => {
+    str += `<li>${elem}</li>`
+});
+// 闭合 ul
+str += '</ul>';
+
+//  EJS 实现
+let result = ejs.render(`<ul>
+    <% xiyou.forEach(elem => { %>
+    <li><%= elem %></li>
+    <% }) %>
+    </ul>`,{xiyou:xiyou});
+
+// EJS 实现 html分离
+const fs = require('fs');
+const html = fs.readFileSync(__dirname + '/EJS_02.html').toString();
+let result = ejs.render(html, {xiyou:xiyou});
+
+console.log(result);
+```
+
+EJS_02.html
+
+```html
+<!-- <ul>
+    <% xiyou.forEach(elem => { %>
+    <li><%= elem %></li>
+    <% }) %>
+</ul> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <ul>
+        <% xiyou.forEach(elem => { %>
+        <li><%= elem %></li>
+        <% }) %>
+    </ul>
+</body>
+</html>
+```
+
