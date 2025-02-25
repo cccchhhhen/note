@@ -1,4 +1,4 @@
-## CommonJS 规范
+## 一、 CommonJS 规范
 module.exports、exports 以及 require 这些都是 CommonJS 模块化规范中的内容。
 而 Node.js 是实现了 CommonJS 模块化规范，二者关系有点像 JavaScript 和 ECMAScript
 
@@ -7,6 +7,7 @@ module.exports、exports 以及 require 这些都是 CommonJS 模块化规范中
 #### 概念介绍
 ##### 包是什么
 [包]英文英文单词是package，代表了一组特定功能的源码集合
+
 ##### 包管理工具
 管理[包]的应用软件，可以对[包]进行下载安装、更新、删除、上传等才做  
 借助包管理工具，可以快速开发项目，提升开发效率  
@@ -353,7 +354,7 @@ nvm 的使用与 npm 相似
 | nvm use 18.12.1       | 切换18.12.1的Node.js          |
 
 
-## ExpressJS
+## 二、 ExpressJS
 
 ### express介绍
 express 是一个基于 Node.js 平台的极简、灵活的WEB应用开发框架，官网[https://www.expressjs.com.cn/](https://www.expressjs.com.cn/) 简单来说，express是一个封装好的工具包，封装了很多功能，便于我们开发WEB应用（HTTP服务）
@@ -374,15 +375,17 @@ app.listen(3000,() => {
 })
 ```
 
-#### express下载
+### express下载
 express本身是一个npm包，所以可以通过npm安装`npm i express`
 
-#### express路由
+### express路由
 
 **什么是路由**
+
 > 路由确定了应用程序如何响应客户端对特定端点的请求
 
 **路由的使用**
+
 > 一个路由的组成有 **请求方法**，**路径**和**回调函数**组成
 express 中提供了一系列方法，可以很方便的使用录用，使用格式如下：  
 `app.<method>(path, callback)`
@@ -411,6 +414,11 @@ app.all('/test',(req,res) => {
 app.all('*',(req,res) => {
     res.end('404 not found');
 })
+// 或者 catch 404 and forword to error handler
+app.use(function(req, res, next){
+    next(createError(404));
+});
+
 // 4.监听端口，启动服务
 app.listen(3000,() => {
     console.log('服务已启动，正在监听端口3000...');
@@ -452,7 +460,7 @@ app.listen(3000,() => {
 })
 ```
 
-##### 获取路由参数
+#### 获取路由参数
 路由参数指的是 URL 路径中的参数（数据）
 ```js
 app.get('/:id.html',(req,res) => {
@@ -465,7 +473,8 @@ app.get('/:id.html',(req,res) => {
 })
 ```
 
-##### 路由参数练习
+#### 路由参数练习
+
 路由结构：`/singer/1.html`，显示歌手的**姓名**和**图片**
 ```js
 // 导入 express
@@ -538,7 +547,7 @@ app.listen(3000,() => {
 }
 ```
 
-#### express响应设置
+### express响应设置
 express 框架封装了一些API来方便给客户端相应数据，并且兼容原生HTTP模块的获取方式
 ```js
 app.get('/response',(req,res) => {
@@ -573,24 +582,25 @@ app.get('/response',(req,res) => {
 
 ```
 
-#### expres 中间件
+### expres 中间件
 
-##### 什么是中间件
+#### 什么是中间件
 **中间件（Middleware）本质是一个回调函数**
 **中间件函数**可以像路由回调一样访问**请求对象（request）、响应对象（response）**
 
-##### 中间件的作用
+#### 中间件的作用
 **中间件的作用**就是**使用函数封装公共操作，简化代码**
 
-##### 中间件的类型
+#### 中间件的类型
 
 * 全局中间件（进站口）
 * 路由中间件（检票口）
 
-###### 定义全局中间件
+##### 定义全局中间件
 **每一个请求**到达服务端之后**都会执行全局中间件函数**
 
 **全局中间件例子**
+
 ```js
 /**
  * 记录每个请求的 url 和 IP 地址
@@ -671,9 +681,9 @@ app.use(express.static(__dirname + '/public'));
 > 2. 如果静态资源与路由规则同事匹配，谁先匹配谁就响应
 > 3. 路由响应动态资源，静态资源中间件响应静态资源
 
-##### 防盗链（未完成）
+### 防盗链（未完成）
 
-##### 路由模块化
+### 路由模块化
 
 路由模块化.js
 
@@ -697,7 +707,7 @@ app.listen(3000, () => {
 })
 ```
 
-routes homeRouter.js
+routes/homeRouter.js
 
 ```js
 // 1.导入 express
@@ -716,7 +726,7 @@ router.get('/search', (req, res) => {
 module.exports = router;
 ```
 
-routes adminRouter.js
+routes/adminRouter.js
 
 ```js
 // 1.导入 express
@@ -737,13 +747,13 @@ router.get('/setting', (req, res) => {
 module.exports = router;
 ```
 
-##### EJS模板引擎
+### EJS模板引擎
 
-###### 什么是模板引擎
+#### 什么是模板引擎
 
 模板引擎是分离**用户界面和业务数据**的一种技术
 
-###### 什么是EJS
+#### 什么是EJS
 
 EJS是一个高效的Javascript的模板引擎
 
@@ -793,7 +803,7 @@ console.log(result);
 </html>
 ```
 
-###### EJS列表渲染
+#### EJS列表渲染
 
 EJS列表渲染.js
 
@@ -848,3 +858,125 @@ EJS_02.html
 </html>
 ```
 
+#### EJS 条件渲染
+
+EJS条件渲染.js
+
+```js
+/**
+ \* 通过 isLogin 决定最终的输出内容
+ \* true  输出 [<span>欢迎回来</span>]
+ \* fasle 输出 [<button>登录</button> <button>注册</button>]
+ */
+// 原生 JS
+let isLogin = true;
+if(isLogin){
+  console.log('<span>欢迎回来</span>');
+}else{
+  console.log('<button>登录</button> <button>注册</button>')
+}
+// EJS 实现
+const ejs = require('ejs');
+const fs = require('fs');
+let html = fs.readFileSync(__dirname+'/EJS_03.html').toString();
+const result = ejs.render(html, {isLogin: isLogin});
+console.log(result);
+```
+
+EJS_03.html
+
+```html
+<% if(isLogin){ %>
+<span>欢迎回来</span>
+<% }else{ %>
+<button>登录</button> <button>注册</button>
+<% } %>
+```
+
+#### express中使用EJS
+
+express中使用EJS.js
+
+```js
+const express = require('express');
+const ejs = require('ejs');
+const path = require('path');
+const app = express();
+
+// 1. 设置模板引擎
+app.set('view engine', 'ejs');// pug twing
+// 2. 设置模板文件存放位置  模板文件：具有模板语法内容的文件
+app.set('views', path.resolve(__dirname, './views'));
+
+app.get('/home', (req, res) => {
+    // 3.render 响应
+    // res.render('模板的文件名', '数据');
+    // 声明变量
+    let title = 'hello world';
+    res.render('home', {title});
+    // 4.创建模板文件 views/home.ejs
+});
+
+app.listen(3000, () => {
+    console.log('server is running...');
+})
+```
+
+views/home.ejs
+
+```ejs
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1><%= title %></h1>
+</body>
+</html>
+```
+
+#### express-generator工具
+
+通过应用生成工具 express-generator 可以快速创建一个应用的骨架
+
+对于较老的 Node 版本，通过 npm 将 Express 应用程序生成器安装到全局环境中并使用：
+
+`npm install -g express-generator`
+
+`express`
+
+查看 `express-generator` 是否安装成功 ：`express -h`
+
+
+add ejs engine support  ： `express -e +文件名`
+
+### 案例实践 -- 记账本
+
+框架搭建
+
+1.  `express -e 'case_count'`
+
+2.  `cd case-count`
+
+3. `npm i`
+
+4.  package.json 中 start 运行方式改为 nodemon
+
+5. index.js中修改
+
+   ```js
+   // 记账本的列表
+   router.get('/account', function(req, res, next) {
+     res.send('账本列表');
+   });
+   
+   // 添加记录
+   router.get('/account/create', function(req, res, next) {
+     res.send('添加记录');
+   })
+   ```
+
+   
