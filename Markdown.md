@@ -18,7 +18,7 @@ Markdown语法简单直观，易于学习和使用，逐渐成为了各种平台
 
 ## 2.在VScode上编辑文档
 
-插件：Markdown All in One 、 Markdown PDF 、 Markdown Preview Github Styling（可选）
+插件：Markdown All in One 、 Markdown PDF 、 Markdown Preview Github Styling（可选）、Template String Converter反引号插件
 
 ## 3.基础Markdown语法
 

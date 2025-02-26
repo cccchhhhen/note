@@ -677,9 +677,89 @@ app.use(express.static(__dirname + '/public'));
 ```
 
 > 注意事项：
-> 1. index.html文件为默认打卡idea资源
-> 2. 如果静态资源与路由规则同事匹配，谁先匹配谁就响应
+> 1. index.html文件为默认打开的资源
+> 2. 如果静态资源与路由规则同时匹配，谁先匹配谁就响应
 > 3. 路由响应动态资源，静态资源中间件响应静态资源
+
+#### 获取请求体数据bosy-parser
+
+express 可以使用body-parser 包处理请求体
+
+1. 安装: `npm i body-parser`
+
+2. 导入: `const bosyParser = require('body-parser');`
+
+3. 获取中间件函数
+
+   ```js
+   // 处理 querystring 格式的请求体
+   let urlParser = bodyParser.urlencoded({extended: false});
+   // 处理 json 格式的请求体
+   let joinParser = bodyParser.json();
+   ```
+
+4. 设置路由中间件，然后使用 `request.body` 来获取请求体数据
+
+   
+
+   bodyParserPrac.js
+
+   ```js
+   /**
+    * 按照要求搭建 HTTP 服务
+    * 
+    * GET    /login    显示表单网页
+    * POST   /login    获取表单中的 [用户名] 和 [密码]
+    */
+   const express = require('express');
+   const bodyParser = require('body-parser');
+   const app = express();
+   
+   // 解析 querystring 格式的请求体
+   const urlParser = bodyParser.urlencoded({extended:false});
+   
+   // 解析 json 格式的请求体
+   const jsonParser = bodyParser.json();
+   
+   app.get('/login', (req, res) => {
+       res.sendFile(__dirname+'/bodyParserPrac.html');
+   });
+   
+   app.post('/login', urlParser, (req, res) => {
+       // console.log(req.query); // {}
+       console.log(req.body);
+       res.send('登录页面');
+   });
+   
+   app.listen(3000, () => {
+       console.log('server is running...');
+   })
+   ```
+
+   bodyParserPrac.html
+   ```html
+   
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>登录页面</title>
+   </head>
+   <body>
+       <h1>login</h1>
+       <hr>
+       <form action="/login" method="post">
+           <!-- 要有 name 属性才能传送数据 -->
+           username:<input type="text" name="username"><br>
+           password:<input type="password" name="password"><br>
+           <button type="submit">login</button>
+       </form>
+   </body>
+   </html>
+   ```
+
+   
 
 ### 防盗链（未完成）
 
@@ -955,7 +1035,7 @@ add ejs engine support  ： `express -e +文件名`
 
 ### 案例实践 -- 记账本
 
-框架搭建
+#### 框架搭建
 
 1.  `express -e 'case_count'`
 
@@ -965,7 +1045,7 @@ add ejs engine support  ： `express -e +文件名`
 
 4.  package.json 中 start 运行方式改为 nodemon
 
-5. index.js中修改
+5. case-count / routes / index.js中修改
 
    ```js
    // 记账本的列表
@@ -979,4 +1059,127 @@ add ejs engine support  ： `express -e +文件名`
    })
    ```
 
+
+#### lowdb 介紹
+
+下载 `npm i lowdb@1.0.0`
+
+lowdbtest/index.js
+
+```js
+// 导入 lowdb
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+ 
+const adapter = new FileSync('db.json') // 在lowdbtest会生成db.json文件 存放数据
+// 获取 db 对象
+const db = low(adapter);
+
+// 初始化数据
+db.defaults({ posts: [], user: {} }).write();
+
+// 写入数据
+db.get('posts').push({ id: 1, title: '今天天气不好~~'}).write();
+db.get('posts').push({ id: 2, title: '今天天气不好~~'}).write();
+
+// 获取数据
+console.log(db.get('posts').value());   
+
+// 获取单条数据
+let res = db.get('posts').find({id: 1}).value();
+console.log(res);
+
+// 删除数据
+let res = db.get('posts').remove({id: 2}).write();
+console.log(res);
+
+// 更新数据
+db.get('posts').find({id: 1}).assign({ title: '今天是雨天！！'}).write();
+```
+
+#### shortid 生成id（已废弃）
+
+1. 安装 `npm i shortid`
+2. 导入 `const shortid = require('shortid');`
+3. 生成id `let id = shortid.generate();`
+4. 将id 拼接在其他数据前面 `arr.unshift({id: id, ...req.body});`
+
+#### 添加、删除  未实现！！
+
+## MongoDB
+
+### 一、简介
+
+1. Mongodb 是什么
+
+   MongoDB是一个基于分布式文件存储的数据库，官方网址 https://www.mongodb.com/
+
+2. 数据库是什么
+
+   数据库(database)是按照数据结构来组织、存储和管理数据的**应用程序**
+
+3. 数据库的作用
+
+   数据库的主要作用就是**管理数据**，对数据进行**增（c create）、删（d delete）、改（u update）、查（r read）**(crud操作)
+
+4. 数据库管理数据的特点
+
+   相比于纯文件管理数据，数据库管理有如下特点：
+
+   * 速度更快
+   * 扩展性更强
+   * 安全性更强
+
+5. 为什么选择Mongodb
+
+   操作语法与 JavaScript 类似，容易上手，学习成本低
+
    
+
+### 二、核心概念
+
+* 数据库 database ：数据库是一个数据仓库，数据库服务下可以创建很多数据库，数据库可以存放很多集合
+* 集合 collection ：集合类似于JS中的数组，在集合中可以存放很多文档
+* 文档 document ：文档是数据库中的最小单位，类似于JS中的对象
+
+![image-20250226134736133](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250226134736133.png)
+
+可以通过JSON 文件来理解 Mongodb 中的概念
+
+* 一个 **JSON 文件** 好比是一个 **数据库**，一个Mongodb 服务下可以有 N个数据库
+* JSON文件中的 一级属性的数组值 好比是 **集合**
+* 数组中的对象好比是 **文档**
+* 对象中的属性有时也称之为 字段
+
+> 一般情况下
+>
+> * 一个项目使用一个数据库
+> * 一个集合会存储同一种类型的数据
+
+三、下载安装与启动
+
+下载地址：https://www.mongodb.com/try/download/community
+
+建议选择 **zip**类型，通用性更强
+
+配置步骤如下：
+
+1. 将压缩包移动到 C:\Program Files 下，然后解压
+2. 创建 C:\data\db 目录，mongodb 会将数据默认保存在这个文件夹
+3. 以 mongodb 中 bin 目录为工作目录，启动命令行
+4. 运行命令 `mongod`
+
+   出现`"msg":"Waiting for connections","attr":{"port":27017,"ssl":"off"}`说明服务端启动成功
+
+   在网页输入127.0.0.1::27017出现`It looks like you are trying to access MongoDB over HTTP on the native driver port.`
+
+   注：要先手动创建data/db文件夹
+
+> 注意：
+>
+> * 为了方便后续使用 mongod 命令，可以将 bin 目录配置到环境变量 Path 中
+> * **千万不要选中服务端端口的内容**，选中会停止服务，可以**敲回车**取消选中
+
+我将压缩包放在e：下，整个路径为`E:\mongodb-windows-x86_64-7.0.17\mongodb-win32-x86_64-windows-7.0.17\bin`，7.0.17版本的mongodb的bin目录下只有mongod.exe和mongos.exe两个应用程序，手动创建e:\data\db文件，在bin目录下执行mongod可以打开服务器，但通过mongo不能打开客户端；要下载mongosh，链接：https://www.mongodb.com/try/download/shell，下载2.4.0，zip版；在该bin下可以执行mongosh文件
+
+环境变量配置问题：mongod配置后不能在任意位置执行，需要指明data的路径`mongod --dbpath "E:\data\db"`;可以将data/db文件新建在c盘下面，这样不用指明路径，但从e盘bin路径下执行的话需要指明路径
