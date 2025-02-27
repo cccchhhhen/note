@@ -1101,8 +1101,8 @@ db.get('posts').find({id: 1}).assign({ title: '今天是雨天！！'}).write();
 
 1. 安装 `npm i shortid`
 2. 导入 `const shortid = require('shortid');`
-3. 生成id `let id = shortid.generate();`
-4. 将id 拼接在其他数据前面 `arr.unshift({id: id, ...req.body});`
+3. 生成 id `let id = shortid.generate();`
+4. 将 id 拼接在其他数据前面 `arr.unshift({id: id, ...req.body});`
 
 #### 添加、删除  未实现！！
 
@@ -1180,6 +1180,404 @@ db.get('posts').find({id: 1}).assign({ title: '今天是雨天！！'}).write();
 > * 为了方便后续使用 mongod 命令，可以将 bin 目录配置到环境变量 Path 中
 > * **千万不要选中服务端端口的内容**，选中会停止服务，可以**敲回车**取消选中
 
-我将压缩包放在e：下，整个路径为`E:\mongodb-windows-x86_64-7.0.17\mongodb-win32-x86_64-windows-7.0.17\bin`，7.0.17版本的mongodb的bin目录下只有mongod.exe和mongos.exe两个应用程序，手动创建e:\data\db文件，在bin目录下执行mongod可以打开服务器，但通过mongo不能打开客户端；要下载mongosh，链接：https://www.mongodb.com/try/download/shell，下载2.4.0，zip版；在该bin下可以执行mongosh文件
+**安装情况：**将压缩包放在e：下，整个路径为`E:\mongodb-windows-x86_64-7.0.17\mongodb-win32-x86_64-windows-7.0.17\bin`，7.0.17版本的mongodb的bin目录下只有mongod.exe和mongos.exe两个应用程序（版本较高的原因），手动创建e:\data\db文件，在bin目录下执行mongod可以打开服务器，但通过`mongo`命令不能打开客户端；要下载mongosh，链接：https://www.mongodb.com/try/download/shell，下载2.4.0，zip版；在该bin下可以执行mongosh文件
 
 环境变量配置问题：mongod配置后不能在任意位置执行，需要指明data的路径`mongod --dbpath "E:\data\db"`;可以将data/db文件新建在c盘下面，这样不用指明路径，但从e盘bin路径下执行的话需要指明路径
+
+### 三、命令行交互
+
+#### 3.1 数据库命令 
+
+1. 显示所有的数据库 
+
+   `show dbs`
+
+2. 切换到指定的数据库，如果数据库不存在会自动创建数据库
+
+   `use db_name`
+
+3. 显示当前所在的数据库
+
+   `db`
+
+4. 删除当前数据库
+
+   `use db_name`
+
+   `db.dropDatabase()`
+
+#### 3.2  集合命令
+
+1. 创建集合
+
+   `db.createCollection('collection_name')`
+
+2. 显示当前数据库中的所有集合
+
+   `show collections / show tables`
+
+3. 删除某个集合
+
+   `db.collection_name.drop()`
+
+4.  重命名集合
+
+   db.collection_name.renameColection('newName')
+
+   或者
+
+   `db.adminCommand({ renameCollection: "sourceDb.sourceCollection",  to: "targetDb.targetCollection", dropTarget: <boolean> })`
+
+   **参数说明：**
+
+   - **renameCollection**：要重命名的集合的完全限定名称（包括数据库名）。
+   - **to**：目标集合的完全限定名称（包括数据库名）。
+   - **dropTarget**（可选）：布尔值。如果目标集合已经存在，是否删除目标集合。默认值为 `false`
+
+#### 3.3 文档命令
+
+1. 插入文档
+
+   | 方法                                    | 用途                               | 是否弃用 |
+   | --------------------------------------- | ---------------------------------- | -------- |
+   | `db.colection_name.insert(documentObj)` | 插入单个或多个文档，会自动创建集合 | 是       |
+   | `save()`                                | 插入或更新文档                     | 是       |
+   | `insertOne()`                           | 插入单个文档                       | 否       |
+   | `insertMany()`                          | 插入多个文档                       | 否       |
+
+2. 删除文档
+
+   | 方法                 | 用途                                                |
+   | -------------------- | --------------------------------------------------- |
+   | `deleteOne()`        | 删除匹配过滤器的单个文档                            |
+   | `deleteMany()`       | 删除所有匹配过滤器的文档                            |
+   | `findOneAndDelete()` | 返回被删除的文档，如果找不到匹配的文档，则返回 null |
+
+   
+
+3. 查询文档
+
+   `db.collection_name.find(查询条件)`
+
+3. 更新文档
+
+   `db.collection_name.update(查询条件，新的文档)`
+
+   `db.collection_name.ipdate({name:'张三'},{$set:{age:19}})`
+
+4. 删除文档
+
+   `db.collection_name.remove(查询条件)`
+
+### 四、Mongoose
+
+**介绍：**Mongoose 是一个对象文档模型库，官网 http://www.mongoosejs.net/
+
+**作用：**方便使用代码操作 mongodb 数据库
+
+**使用流程**
+
+```js
+// 1. 安装 mongoose : npm i mongoose
+
+// 2. 导入 mongoose
+const mongoose = require('mongoose');
+
+// 3. 连接 mongoose 服务                  数据库名称
+mongoose.connect('mongodb://127.0.0.1:27017/newdb');
+
+// 设置回调
+
+// 连接成功回调 ocne 一次 事件回调函数只执行一次
+mongoose.connection.once('open', () => { console.log('connect success'); });
+// 连接错误回调
+mongoose.connection.on('error', () => { console.log('connect error'); });
+// 连接关闭回调
+mongoose.connection.on('close', () => { console.log('connect close'); });
+// 关闭 mongoose 的连接
+setInterval(() => {
+    mongoose.disconnect()
+}, 5000);
+```
+
+#### 4.1 插入文档
+
+```js
+// 连接成功回调 ocne 一次 事件回调函数只执行一次
+mongoose.connection.once('open', () => { 
+    console.log('connect success'); 
+
+    // 5. 创建文档的结构对象
+    let BookSchema = new mongoose.Schema({
+        name: String,
+        author: String,
+        price: Number,
+        is_hot: Boolean,
+        tags: Array,
+        pub_time: Date,
+        test: mongoose.Schema.Types.Mixed
+    });
+
+    // 6. 创建模板对象 对文档操作的封装对象 mongoose 会使用集合的复数创建集合,即使写'book',也会变成books
+    let BookModel = mongoose.model('books', BookSchema);
+
+    // 7.新增  不再支持回调函数
+    BookModel.create({
+        name:'西游记',
+        author:'吴承恩',
+        price:19.9,
+        is_hot: true,
+        tags: ['鬼怪','励志','社会'],
+        pub_time: new Date(),
+        test: 'abc'
+    });
+
+    // 8. 关闭数据库连接（项目运行过程中，不会添加该代码）
+    // mongoose.disconnect();
+});
+```
+
+#### 4.2 字段类型
+
+| 类型       | 描述                                                       |
+| ---------- | ---------------------------------------------------------- |
+| String     |                                                            |
+| Number     |                                                            |
+| Boolean    |                                                            |
+| Array      | 数组，也可以使用 [ ] 来标识                                |
+| Date       |                                                            |
+| Buffer     | Buffer 对象                                                |
+| Mixed      | 任意类型，需使用 `mongoose.Schema.Types.Mixed` 指定        |
+| ObjectId   | 对象ID，需使用 `mongoose.Schema.Types.ObjectId` 指定       |
+| Decimal128 | 高精度数字，需使用 `mongoose.Schema.Types.Decimal128` 指定 |
+
+#### 4.3 字段值验证
+
+Mongoose 有一些内建验证器，可以对字段值进行验证
+
+| 字段值验证 | 代码                                                         |
+| ---------- | ------------------------------------------------------------ |
+| 必填项     | title:{<br>    type: String<br>    required: true<br>},      |
+| 默认值     | title:{<br/>    type: String<br/>    default: '匿名' // 默认值<br/>}, |
+| 枚举值     | gender:{<br/>    type: String<br/>    enum:  ['male', 'female']<br/>}, |
+| 唯一值     | title:{<br/>    type: String<br/>    unique: true<br/>},     |
+
+> unique 需要重建集合才有效果
+
+#### 4.4 更新文档
+
+```js
+BookModel.updateOne({ name: '红楼梦' }, { $set: { price: 9.9 } })
+        .then((result) => console.log(result));
+```
+
+没有回调不报错更新也不成功
+
+#### 4.5 读取文档
+
+```js
+// 不允许回调 用then()
+// 读取单条 
+BookModel.findOne({name:'西游记'}).then((result) => {console.log(result)});
+// 根据 ID 获取文档
+BookModel.findById('67c00fe8ebf0cbe14636870d').then((result) => {console.log(result)});
+// 批量获取
+BookModel.find({price:19.9}).then((result) => {console.log(result)});
+// 读取所有
+BookModel.find().then((result) => {console.log(result)});
+```
+
+4.6  条件控制
+
+1. 运算符
+
+   在 mongodb不能使用 > < >= <= != =等运算符，需要使用替代符号
+
+   * `>` 使用  `$gt`
+
+   *  `<` 使用   `$lt`
+
+   * `>=` 使用  `$gte`
+
+   * `<=` 使用  `$lte`
+
+   * `!==` 使用  `$ne`
+
+     ```js
+     // 价格小于10的书籍
+         BookModel.find({price:{$lt:10}}).then( result => console.log(result));
+     ```
+
+2. 逻辑运算
+
+   * `$or` 逻辑或
+
+     ```js
+     // 曹雪芹 或 吴承恩 的书籍
+         BookModel.find({$or:[{author:'吴承恩'},{author:'曹雪芹'}]}).then( result => console.log(result));
+     ```
+
+   * `$and` 逻辑与
+
+     ```js
+     // 价格大于5且小于10
+         BookModel.find({$and:[{price:{$gt: 5}},{price:{$lt:10}}]}).then( result => console.log(result));
+     ```
+
+3. 正则匹配
+
+   条件中可以直接使用 JS 的正则语法，通过正则可以进行模糊查询
+
+   ```js
+   // 正则表达式 搜索书籍名称中带有'十'的图书
+       BookModel.find({name:/十/}).then( result => console.log(result));
+       BookModel.find({name: new RegExp('十')}).then( result => console.log(result)); // 可以匹配变量
+   ```
+
+   
+
+### 五、个性化读取
+
+#### 5.1 字段筛选
+
+```js
+// 设置字段 只展示书籍名和作者信息
+// 0 不要的字段 ； 1 要的字段
+BookModel.find().select({name:1, author:1, _id:0}).then(result => console.log(result));
+```
+
+#### 5.2 数据排序
+
+```js
+// 数据排序
+// sort 排序; 1 升序; -1 降序
+BookModel.find().select({name:1, price:1, _id:0}).sort({price: -1}).then(result => console.log(result));
+```
+
+#### 5.3 数据截取
+
+```js
+// 数据截取
+// skip 跳过   limit 限定
+BookModel.find().select({name:1,author:1,_id:0})
+.skip(1).
+limit(1).
+then(result => console.log(result));
+```
+
+### 六、代码模块化
+
+![image-20250227172225183](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250227172225183.png)
+
+config - config.js
+
+```js
+// 配置文件
+module.exports = {
+    DBHOST: '127.0.0.1',
+    DBPORT: 27017,
+    DBNAME: 'newdb'
+}
+```
+
+db - db.js
+
+```js
+/**
+ * 
+ * @param {*} success 数据库连接成功的回调
+ * @param {*} error 数据库连接失败的回调
+ */
+module.exports = function (success, error){
+    //  判断 error 为其设置默认值
+    if(typeof error !== 'function'){
+        error = () => {
+            console.log('连接失败~~~');
+        }
+    }
+    const mongoose = require('mongoose');
+    // 导入配置文件
+    const {DBHOST, DBPORT, DBNAME} = require('../config/config');
+    mongoose.connect(`mongodb://${DBHOST}:${DBPORT}/${DBNAME}`);
+    
+    // 设置回调
+    
+    // 连接成功回调 ocne 一次 事件回调函数只执行一次
+    mongoose.connection.once('open', () => { 
+        success();
+    });
+    // 连接错误回调
+    mongoose.connection.on('error', () => { error(); });
+    // 连接关闭回调
+    mongoose.connection.on('close', () => { console.log('connect close'); });
+    
+}
+```
+
+models - MovieModel.js
+
+```js
+const mongoose = require('mongoose');
+// 创建文档结构
+let MovieSchema = mongoose.Schema({
+    title: String,
+    director: String
+});
+// 创建模型对象
+let MovieModel = mongoose.model('movie', MovieSchema);
+
+module.exports = MovieModel;
+```
+
+models - BookModel.js
+
+```js
+const mongoose = require('mongoose');
+// 创建文档的结构对象
+let BookSchema = new mongoose.Schema({
+    name:  String,
+    author: String,
+    price: Number
+});
+
+// 创建模板对象 对文档操作的封装对象
+let BookModel = mongoose.model('books', BookSchema);
+
+module.exports = BookModel;
+```
+
+book_db_ope.js
+
+```js
+// 导入db文件
+const db = require('./db/db');
+// 导入 mongoose 
+const mongoose = require('mongoose');
+const BookModel = require('./models/BookModel')
+db(() => {
+    console.log('连接成功！');
+    BookModel.find().select({name:1, author:1, _id:0}).then(result => console.log(result));
+})
+
+```
+
+movie_db_ope.js
+
+```js
+const mongoose = require('mongoose');
+const db = require('./db/db');
+const MovieModel = require('./models/MovieModel')
+db(() => {
+    // console.log('movie 连接成功~~~');
+    // MovieModel.create({
+    //     title: '让子弹飞',
+    //     director: '姜文'
+    // }).then(result => console.log(result));
+    MovieModel.find().then(result => console.log(result));
+})
+```
+
+七、图形化管理工具
+
+* Robo 3T 免费  https://github.com/Studio3T/robomongo/releases
+* Navicat 收费  https://www.navicat.com.cn/
