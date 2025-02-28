@@ -353,13 +353,14 @@ nvm 的使用与 npm 相似
 | nvm uninstall 18.12.1 | 删除某个版本的Node.js         |
 | nvm use 18.12.1       | 切换18.12.1的Node.js          |
 
-
 ## 二、 ExpressJS
 
-### express介绍
+### 2.1 express介绍
+
 express 是一个基于 Node.js 平台的极简、灵活的WEB应用开发框架，官网[https://www.expressjs.com.cn/](https://www.expressjs.com.cn/) 简单来说，express是一个封装好的工具包，封装了很多功能，便于我们开发WEB应用（HTTP服务）
 
-### express使用
+### 2.2 express使用
+
 ```js
 // 1.导入 express
 const express = require('express')
@@ -375,10 +376,10 @@ app.listen(3000,() => {
 })
 ```
 
-### express下载
+### 2.3 express 下载
 express本身是一个npm包，所以可以通过npm安装`npm i express`
 
-### express路由
+### 2.4 express 路由
 
 **什么是路由**
 
@@ -460,7 +461,7 @@ app.listen(3000,() => {
 })
 ```
 
-#### 获取路由参数
+#### 2.4.1 获取路由参数
 路由参数指的是 URL 路径中的参数（数据）
 ```js
 app.get('/:id.html',(req,res) => {
@@ -473,7 +474,7 @@ app.get('/:id.html',(req,res) => {
 })
 ```
 
-#### 路由参数练习
+#### 2.4.2 路由参数练习
 
 路由结构：`/singer/1.html`，显示歌手的**姓名**和**图片**
 ```js
@@ -725,7 +726,7 @@ express 可以使用body-parser 包处理请求体
        res.sendFile(__dirname+'/bodyParserPrac.html');
    });
    
-   app.post('/login', urlParser, (req, res) => {
+   app.post('/login', urlParser, (req, res) => { // 执行 urlParser 后，req中才有body参数
        // console.log(req.query); // {}
        console.log(req.body);
        res.send('登录页面');
@@ -1037,15 +1038,17 @@ add ejs engine support  ： `express -e +文件名`
 
 #### 框架搭建
 
-1.  `express -e 'case_count'`
+1. `express -e 'case_count'`
 
-2.  `cd case-count`
+2. `cd case-count`
 
 3. `npm i`
 
-4.  package.json 中 start 运行方式改为 nodemon
+4. package.json 中 start 运行方式改为 nodemon
 
-5. case-count / routes / index.js中修改
+5. `npm start`
+
+6. case-count / routes / index.js中修改
 
    ```js
    // 记账本的列表
@@ -1104,7 +1107,254 @@ db.get('posts').find({id: 1}).assign({ title: '今天是雨天！！'}).write();
 3. 生成 id `let id = shortid.generate();`
 4. 将 id 拼接在其他数据前面 `arr.unshift({id: id, ...req.body});`
 
-#### 添加、删除  未实现！！
+#### 完整案例
+
+![image-20250228141545411](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250228141545411.png)
+
+
+
+index.js
+
+```js
+var express = require('express');
+// const { render } = require('../app');
+var router = express.Router();
+// 导入lowdb
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const adapter = new FileSync(__dirname + '/../data/db/db.json');
+const db = low(adapter);
+const shortid = require('shortid');
+/* GET home page. */
+router.get('/account', function(req, res, next) {
+  // res.send('记账本');
+  // 渲染数据
+
+  // 获取数据
+  let records = db.get('records').value();
+  // console.log(records);
+  res.render('index',{records});
+});
+
+router.get('/account/create', function(req, res, next) {
+  // res.send('新增记录');
+  res.render('create');
+})
+
+router.post('/account', function (req, res, next){
+  // console.log(req.body);
+  // 初始化数据库，可手动初始化
+  // db.defaults({records:[]}).write();
+  // 生成唯一id
+  let id = shortid.generate();
+  // 存储数据
+  db.get('records').unshift({id:id, ...req.body}).write();
+  res.render('success',{msg: '添加成功哦~~', url: '/account'});
+})
+
+// 删除记录
+router.get('/account/:id', (req, res) => {
+  // 过去 params 的 id 参数
+  let id = req.params.id;
+  // 删除
+  db.get('records').remove({id: id}).write();
+  // 提醒
+  // res.send('删除成功');
+  res.render('success',{msg: '删除成功~~', url:'/account'})
+})
+
+module.exports = router;
+
+```
+
+index.ejs
+
+```ejs
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>记账本</title>
+  <style>
+    .accountBox{
+      width: 500px;
+      margin: 20px auto;
+      border: 1px solid #cccccc;
+    }
+    .accountBox .time{
+      color: white;
+      padding: 5px;
+    }
+    .accountBox .type{
+      border-radius: 8px;
+      padding: 3px;
+      font-size: 10px;
+      margin: 0 10px;
+    }
+    .accountBox .content{
+      padding: 8px;
+    }
+    button{
+      margin: 20px;
+    }
+    .in .time{
+      background-color: rgb(148, 223, 148);
+      color: green;
+
+    }
+    .in .type{
+      background-color: rgb(180, 245, 180);
+      color: green;
+    }
+
+    .out .time{
+      background-color: pink;
+      color: rgb(194, 125, 159);
+    }
+    .out .type{
+      background-color: rgb(243, 196, 204);
+      color: rgb(231, 97, 120);
+    }
+    .accountBox .delLink{
+      text-decoration: none;
+      color: grey;
+    }
+    .accountBox .content{
+      display: inline-flex;
+    }
+    .accountBox .content .title{
+      /* width: 250px; */
+      min-width: 300px;
+      /* display: flex;
+      justify-content: space-evenly; */
+    }
+    .accountBox .content .type{
+      margin: 0 20px;
+    }
+    .accountBox .content .account{
+      width: 70px;
+    }
+    .accountBox .content .delLink{
+      margin:0  10px;
+    }
+    .accountBox .content .delLink:hover{
+      background-color: #cccccc;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h2>account</h2>
+  <hr>
+  <% records.forEach( r => { %>
+  <div class="accountBox <%= r.type === '1' ? 'in' : 'out' %> ">
+    <div class="time"><%= r.time %></div>
+    <div class="content">
+      <span class="title"><%= r.title %></span>
+      <% if(r.type === '-1'){ %>
+      <span class="type">支出</span>
+        <% }else{ %>
+          <span class="type">收入</span>
+          <% } %>
+      <span class="account"><%= r.account %>元</span>
+      <a class="delLink" href="/account/<%= r.id %>">
+        <span class="delBtn">×</span>
+      </a>
+    </div>
+  </div>
+  <% }) %>
+
+</body>
+</html>
+```
+
+create.ejs
+
+```ejs
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .group,button{
+            margin: 10px;
+        }
+        .group label, button{
+            font-size: large;
+            font-weight: bold;
+        }
+        input, select{
+            margin: 10px 0px;
+            width: 500px;
+        }
+        form{
+            width: 500px;
+        }
+        button{
+            width: 500px;
+        }
+        
+    </style>
+</head>
+<body>
+    <h3>新增记录</h3>   
+    <hr>
+    <form action="/account" method="post">
+        <div class="group">
+            <label for="title">事件</label><br>
+            <input type="text" name="title">
+        </div>
+
+        <div class="group">
+            <label for="time">时间</label><br>
+            <input type="text" name="time" id="time">
+        </div>
+
+        <div class="group">
+            <label for="type">类型</label><br>
+            <select name="type" id="type">
+                <option value="1">收入</option>
+                <option value="-1">支出</option>
+            </select>
+        </div>
+
+        <div class="group">
+            <label for="account">金额</label><br>
+            <input type="text" name="account" id="account">
+        </div>
+
+        <div class="group">
+            <label for="remark">备注</label><br>
+            <input type="text" name="reamrk" id="remark">
+        </div>
+        
+        <button type="submit">提交</button>
+    </form> 
+</body>
+</html>
+```
+
+success.ejs
+
+```ejs
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1><%= msg %></h1>
+    <a href="<%= url %>">点击跳转</a>
+</body>
+</html>
+```
+
+
 
 ## MongoDB
 
