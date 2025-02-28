@@ -1356,9 +1356,9 @@ success.ejs
 
 
 
-## MongoDB
+## 三、MongoDB
 
-### 一、简介
+### 3.1、简介
 
 1. Mongodb 是什么
 
@@ -1386,7 +1386,7 @@ success.ejs
 
    
 
-### 二、核心概念
+### 3.2、核心概念
 
 * 数据库 database ：数据库是一个数据仓库，数据库服务下可以创建很多数据库，数据库可以存放很多集合
 * 集合 collection ：集合类似于JS中的数组，在集合中可以存放很多文档
@@ -1434,9 +1434,9 @@ success.ejs
 
 环境变量配置问题：mongod配置后不能在任意位置执行，需要指明data的路径`mongod --dbpath "E:\data\db"`;可以将data/db文件新建在c盘下面，这样不用指明路径，但从e盘bin路径下执行的话需要指明路径
 
-### 三、命令行交互
+### 3.3、命令行交互
 
-#### 3.1 数据库命令 
+#### 3.3.1 数据库命令 
 
 1. 显示所有的数据库 
 
@@ -1456,7 +1456,7 @@ success.ejs
 
    `db.dropDatabase()`
 
-#### 3.2  集合命令
+#### 3.3.2  集合命令
 
 1. 创建集合
 
@@ -1484,7 +1484,7 @@ success.ejs
    - **to**：目标集合的完全限定名称（包括数据库名）。
    - **dropTarget**（可选）：布尔值。如果目标集合已经存在，是否删除目标集合。默认值为 `false`
 
-#### 3.3 文档命令
+#### 3.3.3 文档命令
 
 1. 插入文档
 
@@ -1519,7 +1519,7 @@ success.ejs
 
    `db.collection_name.remove(查询条件)`
 
-### 四、Mongoose
+### 3.4、Mongoose
 
 **介绍：**Mongoose 是一个对象文档模型库，官网 http://www.mongoosejs.net/
 
@@ -1686,9 +1686,9 @@ BookModel.find().then((result) => {console.log(result)});
 
    
 
-### 五、个性化读取
+### 3.5、个性化读取
 
-#### 5.1 字段筛选
+#### 3.5.1 字段筛选
 
 ```js
 // 设置字段 只展示书籍名和作者信息
@@ -1696,7 +1696,7 @@ BookModel.find().then((result) => {console.log(result)});
 BookModel.find().select({name:1, author:1, _id:0}).then(result => console.log(result));
 ```
 
-#### 5.2 数据排序
+#### 3.5.2 数据排序
 
 ```js
 // 数据排序
@@ -1704,7 +1704,7 @@ BookModel.find().select({name:1, author:1, _id:0}).then(result => console.log(re
 BookModel.find().select({name:1, price:1, _id:0}).sort({price: -1}).then(result => console.log(result));
 ```
 
-#### 5.3 数据截取
+#### 3.5.3 数据截取
 
 ```js
 // 数据截取
@@ -1715,7 +1715,7 @@ limit(1).
 then(result => console.log(result));
 ```
 
-### 六、代码模块化
+### 3.6、代码模块化
 
 ![image-20250227172225183](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250227172225183.png)
 
@@ -1730,7 +1730,7 @@ module.exports = {
 }
 ```
 
-db - db.js
+db / db.js
 
 ```js
 /**
@@ -1764,7 +1764,7 @@ module.exports = function (success, error){
 }
 ```
 
-models - MovieModel.js
+models / MovieModel.js
 
 ```js
 const mongoose = require('mongoose');
@@ -1779,7 +1779,7 @@ let MovieModel = mongoose.model('movie', MovieSchema);
 module.exports = MovieModel;
 ```
 
-models - BookModel.js
+models / BookModel.js
 
 ```js
 const mongoose = require('mongoose');
@@ -1827,7 +1827,95 @@ db(() => {
 })
 ```
 
-七、图形化管理工具
+### 3.7、图形化管理工具
 
 * Robo 3T 免费  https://github.com/Studio3T/robomongo/releases
 * Navicat 收费  https://www.navicat.com.cn/
+
+### 3.8、案例优化 未完成
+
+## 四、API接口
+
+#### 4.1 简介
+
+##### 4.1.1 接口是什么
+
+接口是**前后端通信的桥梁**，英文API（Application Program Interface），也称之为**API接口**
+
+简单理解：一个接口就是**服务中的一个路由规则**，根据请求响应结果
+
+这里接口指的是 [ 数字接口 ]，**与编程语言（Java、Go 等）中的接口语法不同**
+
+##### 4.1.2 接口的开发与调用
+
+大多数接口都是用**后端工程师**开发的，**开发语言不限**
+
+一般情况下接口都是由**前端工程师**调用的，但有时**后端工程师也会调用接口**，比如短信接口、支付接口等
+
+##### 4.1.3 接口的组成
+
+一个接口一般由如下几个部分组成：
+
+* 请求方法
+* 接口地址（URL）
+* 请求参数
+* 响应结果
+
+一个接口示例 https://www.free-api.com/doc/325
+
+#### 4.2 RESTful API
+
+RESTful API 是一种特殊风格的接口，主要特点有如下几个：
+
+* URL 中的路径表示 **资源**，路径中不能有**动词**，例如`create,delete,update`等都不能有
+* 操作资源要与 **HTTP 请求方法 ** 对应
+* 操作结果要与 **HTTP 响应状态码 ** 对应
+
+规则示例：
+
+| 操作         | 请求类型                 | URL      | 返回                 |
+| ------------ | ------------------------ | -------- | -------------------- |
+| 新增歌曲     | POST                     | /song    | 返回新生成的歌曲信息 |
+| 删除歌曲     | DELETE                   | /song/10 | 返回一个空文档       |
+| 修改歌曲     | PUT ：新的替换所有旧的   | /song/10 | 返回更新后的歌曲信息 |
+| 修改歌曲     | PATCH ：只会替换某个参数 | /song/10 | 返回更新后的歌曲信息 |
+| 获取所有歌曲 | GET                      | /song    | 返回歌曲列表数组     |
+| 获取单个歌曲 | GET                      | /song/10 | 返回单个歌曲信息     |
+
+> 扩展阅读: https://www.ruanyifeng.com/blog/2014/05/restful_api.html
+
+#### 4.3 json-server
+
+json-server 本身是一个 JS 编写的工具包，可以快速搭建 RESTful API 服务
+
+官方网址：https://github.com/typicode/json-server
+
+操作步骤：
+
+1. 全局安装 `npm i -g json-server`
+
+2. 创建 JSON 文件（eg：db.json），编写基本结构
+
+   ```json
+   {
+       "song":[
+           {"id": 1, "name": "干杯", "singers": "五月天"},
+           {"id": 2, "name": "当", "singers": "动力火车"},
+           {"id": 3, "name": "不能说的秘密", "singers": "周杰伦"}
+       ]
+   }
+   ```
+
+3. **以 JSON 文件所在文件夹作为工作目录**，执行如下命令
+
+   `json-server --watch db.json`
+
+   默认监听端口为 `3000`
+
+#### 4.4 接口测试工具
+
+* apipost   https://www.apipost.cn/   (中文)
+* apifox     https://www.apifox.cn/     (中文)
+* apipost   https://www.postman.com/   (英文)
+
+![image-20250228155509025](E:\VSProject\note_md\note\images\image-20250228155509025.png)
