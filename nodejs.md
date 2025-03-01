@@ -1112,7 +1112,7 @@ db.get('posts').find({id: 1}).assign({ title: '今天是雨天！！'}).write();
 
 #### 完整案例
 
-![image-20250228141545411](E:\VSProject\note_md\note\nodejs.assets\image-20250228141545411.png)
+![image-20250228141545411](nodejs.assets/image-20250228141545411.png)
 
 
 
