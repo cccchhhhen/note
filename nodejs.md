@@ -116,7 +116,7 @@ windows 默认不允许 npm 全局命令执行脚本文件，所以需要修改�
 1. 以**管理员身份**打开powershell命令行
 2. 键入命令 `set-ExecutionPolicy remoteSigned`
 
-![alt text](Snipaste_2025-02-20_15-21-47.png)  
+![alt text](E:\VSProject\note_md\note\nodejs.assets\Snipaste_2025-02-20_15-21-47.png)  
 或者选择其他终端执行命令
 
 ###### 环境变量Path
@@ -463,6 +463,9 @@ app.listen(3000,() => {
 
 #### 2.4.1 获取路由参数
 路由参数指的是 URL 路径中的参数（数据）
+
+语法：`:参数名`， 获取：`req.params.参数名`
+
 ```js
 app.get('/:id.html',(req,res) => {
     // 获取 URL 路由参数
@@ -1109,7 +1112,7 @@ db.get('posts').find({id: 1}).assign({ title: '今天是雨天！！'}).write();
 
 #### 完整案例
 
-![image-20250228141545411](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250228141545411.png)
+![image-20250228141545411](E:\VSProject\note_md\note\nodejs.assets\image-20250228141545411.png)
 
 
 
@@ -1392,7 +1395,7 @@ success.ejs
 * 集合 collection ：集合类似于JS中的数组，在集合中可以存放很多文档
 * 文档 document ：文档是数据库中的最小单位，类似于JS中的对象
 
-![image-20250226134736133](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250226134736133.png)
+![image-20250226134736133](E:\VSProject\note_md\note\nodejs.assets\image-20250226134736133.png)
 
 可以通过JSON 文件来理解 Mongodb 中的概念
 
@@ -1438,51 +1441,40 @@ success.ejs
 
 #### 3.3.1 数据库命令 
 
-1. 显示所有的数据库 
 
-   `show dbs`
 
-2. 切换到指定的数据库，如果数据库不存在会自动创建数据库
+| 方法                                 | 用途                                                 |
+| ------------------------------------ | ---------------------------------------------------- |
+| `show dbs`                           | 显示所有的数据库                                     |
+| `use db_name`                        | 切换到指定的数据库，如果数据库不存在会自动创建数据库 |
+| `db`                                 | 显示当前所在的数据库                                 |
+| `use db_name`<br>`db.dropDatabase()` | 删除当前数据库                                       |
 
-   `use db_name`
 
-3. 显示当前所在的数据库
-
-   `db`
-
-4. 删除当前数据库
-
-   `use db_name`
-
-   `db.dropDatabase()`
 
 #### 3.3.2  集合命令
 
-1. 创建集合
 
-   `db.createCollection('collection_name')`
 
-2. 显示当前数据库中的所有集合
+| 方法                                     | 用途                       |
+| ---------------------------------------- | -------------------------- |
+| `db.createCollection('collection_name')` | 创建集合                   |
+| `show collections / show tables`         | 显示当前数据库中的所有集合 |
+| `db.collection_name.drop()`              | 删除某个集合               |
 
-   `show collections / show tables`
+* 重命名集合
 
-3. 删除某个集合
+  db.collection_name.renameColection('newName')
 
-   `db.collection_name.drop()`
+  或者
 
-4.  重命名集合
+  `db.adminCommand({ renameCollection: "sourceDb.sourceCollection",  to: "targetDb.targetCollection", dropTarget: <boolean> })`
 
-   db.collection_name.renameColection('newName')
+  **参数说明：**
 
-   或者
-
-   `db.adminCommand({ renameCollection: "sourceDb.sourceCollection",  to: "targetDb.targetCollection", dropTarget: <boolean> })`
-
-   **参数说明：**
-
-   - **renameCollection**：要重命名的集合的完全限定名称（包括数据库名）。
-   - **to**：目标集合的完全限定名称（包括数据库名）。
-   - **dropTarget**（可选）：布尔值。如果目标集合已经存在，是否删除目标集合。默认值为 `false`
+  - **renameCollection** ：要重命名的集合的完全限定名称（包括数据库名）。
+  - **to**：目标集合的完全限定名称（包括数据库名）。
+  - **dropTarget**（可选）：布尔值。如果目标集合已经存在，是否删除目标集合。默认值为 `false`
 
 #### 3.3.3 文档命令
 
@@ -1717,7 +1709,7 @@ then(result => console.log(result));
 
 ### 3.6、代码模块化
 
-![image-20250227172225183](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20250227172225183.png)
+![image-20250227172225183](E:\VSProject\note_md\note\nodejs.assets\image-20250227172225183.png)
 
 config - config.js
 
@@ -1919,3 +1911,61 @@ json-server 本身是一个 JS 编写的工具包，可以快速搭建 RESTful A
 * apipost   https://www.postman.com/   (英文)
 
 ![image-20250228155509025](E:\VSProject\note_md\note\images\image-20250228155509025.png)
+
+**apipost 公共参数与文档功能**
+
+新建目录 -> 将接口存在目录下（拖动时目录的颜色变色可松手）->点击新建的目录，可填写公共参数，在各个接口中可以看到公共参数
+
+在响应实例中可以添加例子
+
+右击目录可分享文档，也可下载文档，复制链接打开可以看到接口参数以及响应实例
+
+
+
+## 五、会话控制
+
+### 5.1 介绍
+
+所谓会话控制就是 **对会话进行控制**
+
+HTTP 是一种无状态的协议，它没有办法区分多次的请求是否来自于同一个客户端，**无法区分用户**
+
+而产品中又大量存在这样的需求，所以我们需要通过**会话控制**来解决该问题
+
+常见的会话控制技术有三种：
+
+* cookie
+* session
+* token
+
+### 5.2 cookie
+
+#### 5.2.1 cookie是什么
+
+cookie 是 HTTP 服务器发送到用户浏览器并保存在本地的一小块数据
+
+**cookie 是保存在浏览器的一小块数据**
+
+**cookie 是按照域名划分保存的**
+
+简单示例：
+
+| 域名             | cookie                       |
+| ---------------- | ---------------------------- |
+| www.baidu.com    | a=100;b=200                  |
+| www.bilibili.com | xid=1020abce121;hm=112411213 |
+| js.com           | x=100;ocw=12414cce           |
+
+#### 5.2.2 cookie 的特点
+
+浏览器向服务器发请求时，会自动将 **当前域名下** 可用的cookie设置在请求头中，然后传递给服务器
+
+这个请求头的名字也叫**cookie**，所以将 **cookie 理解为一个 HTTP 的请求头也是可以的**
+
+#### 5.2.3 浏览器操作cookie 
+
+浏览器操作 cookie 的操作，相对使用较少，了解即可
+
+1. 禁用所有 cookie
+2. 删除 cookie 
+3. 查看 cookie
