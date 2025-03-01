@@ -1920,6 +1920,35 @@ json-server 本身是一个 JS 编写的工具包，可以快速搭建 RESTful A
 
 右击目录可分享文档，也可下载文档，复制链接打开可以看到接口参数以及响应实例
 
+#### 4.5 案例完善 -- 结合API接口
+
+```js
+// 新增记录
+router.post('/account', function (req, res, next){
+  // 此处可进行表单验证
+  // 验证每个参数是否正确，即时给客户端返回消息
+  // 返回給前端，怎么显示是前端的问题
+
+  // 数据库存储数据
+  AccountModel.create({ ...req.body})
+  .then(result => {
+    // console.log(result)
+    res.json({
+      code: '0000',// 响应成功一般用'20000' 或者 '0000' ，设置code后，一般不设置响应状态码，不然前端处理起来麻烦
+      msg:'添加成功',
+      data: result
+    })
+  })
+  .catch((err) => {
+    res.json({
+      code: '1002',// 相响应不成功一般用 非零 如 '1001'
+      msg:'添加失败',
+      data: null
+    })
+  });
+})
+```
+
 
 
 ## 五、会话控制
@@ -1969,3 +1998,83 @@ cookie 是 HTTP 服务器发送到用户浏览器并保存在本地的一小块�
 1. 禁用所有 cookie
 2. 删除 cookie 
 3. 查看 cookie
+
+
+
+**express 框架中设置 cookie**
+
+```js
+// 创建路由规则
+app.get('/set-cookie', (req, res) => {
+    // 会在浏览器关闭时 销毁
+    // res.cookie('name','iloveyou'); 
+    res.cookie('name','iloveyou', {maxAge:30 * 1000}); // 时间是ms，在浏览器报文中的是s
+    res.send('hello world');
+})
+```
+
+**express 框架中删除 cookie**
+
+```js
+// 删除cookie
+app.get('/remove-cookie', (req, res) => {
+    // 调用方法
+    res.clearCookie('name');
+    res.send('删除成功~~');
+})
+```
+
+删除cookie服务器是将对应的cookie的过期时间设置为1970年
+
+**express 框架中获取 cookie**
+
+`npm i cookie-parser`
+
+```js
+const express = require('express');
+const cookieParser = require('cookie-parser');
+
+const app = express();
+app.use(cookieParser());
+
+// 创建路由规则
+app.get('/set-cookie', (req, res) => {
+    // 会在浏览器关闭时 销毁
+    // res.cookie('name','iloveyou'); 
+    res.cookie('name','zhangsan', {maxAge:30 * 1000});
+    res.cookie('theme', 'blue');
+    res.send('hello world');
+})
+
+// 删除cookie
+app.get('/remove-cookie', (req, res) => {
+    // 调用方法
+    res.clearCookie('name');
+    res.send('删除成功~~');
+})
+
+// 获取cookie
+app.get('/get-cookie', (req, res) => {
+    console.log(req.cookies);
+    res.send(`hello ${req.cookies.name}`);
+})
+app.listen(3000, () => {
+    console.log('server is runing...');
+})
+```
+
+### 5.3 session
+
+#### 5.3.1 session 是什么
+
+session 是保存在 服务端的一块数据，保存当前访问用户的相关信息
+
+#### 5.3.2 session 的作用
+
+实现会话控制，可以识别用户的身份，快速获取当前用户的相关信息
+
+#### 5.3.3 session 运行流程
+
+填写账号和密码校验身份，校验通过后创建 session 信息，然后将 session_id 的值通过响应头返回给浏览器
+
+有了cookie，下次发送请求时会自动携带cookie，服务器通过 cookie中的session_id的值确定用户身份
