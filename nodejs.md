@@ -2079,6 +2079,111 @@ session 是保存在 服务端的一块数据，保存当前访问用户的相�
 
 有了cookie，下次发送请求时会自动携带cookie，服务器通过 cookie中的session_id的值确定用户身份
 
+#### 5.3.4 案例完善
+
+1. 响应注册 / 登录页面
+
+   ```ejs
+   // views/auth/reg.ejs  views/auth/login.ejs
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>注册</title>
+   </head>
+   <body>
+       <h3>注册</h3>
+       <form action="/reg" method="post">
+           <label for="username">用户名</label>
+           <input type="text" name="username" id="username"><br>
+           <label for="password">密码</label>
+           <input type="password" name="password" id="password"><br>
+           <button type="submit">注册</button>
+       </form>
+   </body>
+   </html>
+   ```
+
+2. 用户登录
+
+   ```js
+   // routes/web/auth.js
+   const express = require('express');
+   const router = express.Router();
+   const md5 = require('md5');
+   const UserModel = require('../../models/UserModel')
+   // 注册页面
+   router.get('/reg', (req, res) => {
+       res.render('auth/reg');
+   })
+   // 注册操作
+   router.post('/reg', (req, res) => {
+       // console.log(req.body);
+       UserModel.create({
+           ...req.body,
+           password: md5(req.body.password)
+       })
+       .then( data => {
+           console.log('注册成功~~');
+       })
+       .catch( err => {
+           console.log('注册失败~~~');
+       })
+       res.render('success',{msg:'注册成功', url: '/login'});
+   })
+   // 登录页面
+   router.get('/login', (req, res) => {
+       res.render('auth/login');
+   })
+   // 登录操作
+   router.post('/login', (req, res) => {
+       let { username, password } = req.body;
+       console.log(req.body);
+       UserModel.findOne({username: username, password: md5(password)})
+       .then( data => {
+           if(data){
+               req.session.username = data.username;
+               req.session._id = data._id;
+               res.render('success', {msg: '登陆成功', url: '/account'});
+               return;
+           }else{
+               res.send('账号密码错误~~');
+               return ;
+           }
+           
+       })
+       .catch( err => {
+           console.log(err);
+       })
+   })
+   
+   // 退出登录
+   router.post('/logout', (req, res) => {
+       req.session.destroy(() => {
+           res.render('success', {msg:'退出成功', url: '/login'});
+       })
+   })
+   module.exports = router;
+   ```
+
+3. 用户登录检测
+
+   ```js
+   // middlewares/checkLoginMiddleWare.js
+   // 登录检测中间件
+   module.exports = (req, res, next) => {
+       // 判断
+       if(!req.session.username){
+           return res.redirect('/login');
+       }
+       next();
+   }
+   
+   ```
+
+   
+
 ### 5.4 token
 
 #### 5.4.1 token 是什么
@@ -2099,7 +2204,7 @@ session 是保存在 服务端的一块数据，保存当前访问用户的相�
   * 数据存储在客户端
 * 数据更安全
   * 数据加密
-  * 可以避免 CSRF （跨站请求伪造）
+  * 可以避免 CSRF （跨站请求伪造 Cross-site request forgery）
 * 扩展性更强
   * 服务间可以共享
   * 增加服务节点更简单
@@ -2136,3 +2241,24 @@ jwt.verify(t, 'chen', (err, data) => {
 })
 ```
 
+### 5.5 本地域名
+
+所谓本地域名就是 **只能在本地使用的域名**，一般在开发阶段使用
+
+#### 5.5.1 操作流程
+
+编辑文件 `C:\Windows\System32\drivers\etc\hosts`
+
+127.0.0.1   www.chen.com
+
+如果修改失败，**可以修改文件的权限**
+
+#### 5.5.2 原理
+
+在地址栏输入 **域名**  后，浏览器会先进行 DNS (Domain Name System) 查询，获取该域名对应的 IP 地址
+
+请求会发送到 DNS 服务器，可以 **根据域名返回 IP 地址**
+
+可以通过 ipconfig /all 查看本机的 DNS服务器
+
+hosts 文件也可以设置域名与IP的映射关系，在发送请求前，可以通过该文件获取域名的IP地址
