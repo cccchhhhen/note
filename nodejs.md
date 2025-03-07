@@ -2030,6 +2030,8 @@ app.get('/remove-cookie', (req, res) => {
 
 `npm i cookie-parser`
 
+`app.use(cookieParser());`
+
 ```js
 const express = require('express');
 const cookieParser = require('cookie-parser');
