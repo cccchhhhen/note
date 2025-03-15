@@ -1926,7 +1926,7 @@ json-server 本身是一个 JS 编写的工具包，可以快速搭建 RESTful A
 // 新增记录
 router.post('/account', function (req, res, next){
   // 此处可进行表单验证
-  // 验证每个参数是否正确，即时给客户端返回消息
+  // 验证每个参数是否正确，及时给客户端返回消息
   // 返回給前端，怎么显示是前端的问题
 
   // 数据库存储数据
@@ -2233,7 +2233,7 @@ console.log(token);  // t
 
 const t = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InpoYW5nc2FuIiwiaWF0IjoxNzQwOTk0NDU3LCJleHAiOjE3NDA5OTQ1MTd9.z4834RtmrO2g692Ozil3RgJ7xP32sAjHJKP73-eEYGM';
 
-// 校验 token
+// 校验 token 在header里面，通过req.get('token')获取
 jwt.verify(t, 'chen', (err, data) => {
     if(err){
         console.log('校验失败~~~');
