@@ -105,7 +105,107 @@ const getAccountList = async () => {
 </div>
 ```
 
-## 四、token鉴权
+## 四、vue拦截器 -- token鉴权
+
+> **`axios` 封装**
+
+```ts
+const service = axios.create({
+    baseURL: 'https://XXX.XXX.com', // 你的API基础URL
+    timeout: 5000, // 请求超时时间
+    // 其他axios配置...
+    withCredentials: true // 跨域请求时是否需要使用凭证
+})
+```
+
+> **请求拦截器**
+
+```ts
+// 请求拦截器
+service.interceptors.request.use(config => {
+  // 在发送请求前做什么
+  return config
+}, error => {
+    // 对请求错误做些什么
+    return Promise.reject(error);
+})
+```
+
+> **响应拦截器**
+
+```ts
+// 响应拦截器
+service.interceptors.response.use(
+    // 对响应数据做什么
+  response => response.data, 
+  error => {
+    // 对响应错误做什么
+    return Promise.reject(error)
+  }
+)
+```
+
+
+
+```ts
+// src/utils/request.ts
+import axios from 'axios';
+import { getToken } from '../utils/auth';
+const service = axios.create({
+    baseURL:'http://127.0.0.1:9000'
+})
+// 请求拦截器
+service.interceptors.request.use(config => {
+  // 请求头携带 token 
+  const token = getToken(); // 12. 获取存储的 token
+  if (token) {
+    config.headers['token'] = token; // 13. 自动携带 token
+  }
+  return config
+})
+
+// 响应拦截器
+service.interceptors.response.use(
+  response => response.data, // 14. 直接返回 data 内容
+  error => {
+    if (error.response?.status === 401) { // 15. 处理 401 未授权
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+export default service;
+// 在导入的时候，可以任意命名，比如import axios from './utils/axios'
+```
+
+## 五、接口封装
+
+```ts
+// src/api/index.js
+
+// define interface function
+import axios from "@/utils/request";
+// login interface
+export const userLogin = (data:any) => axios.post('login',data);
+// reg interface
+export const userReg = (data:any) => axios.post('reg', data);
+// get account list interface
+export const getAccountInter = () => axios.get('account-list');
+// create account interface
+export const createAccount = (data:any) => axios.post('create-account', data);
+```
+
+## 六、接口调用
+
+```ts
+// src/components/Login.vue
+import { userLogin } from '../api';
+...
+const response = await userLogin(formData.value);
+```
+
+## 七、路由守卫
 
 
 
@@ -143,40 +243,7 @@ export const getAccountList = (params) => axios.get('account-list',{params});
 ### 6.1 vue 拦截器
 
 ```ts
-// src/utils/axios.ts
-// src/utils/request.js
-// axios进行二次封装
-import axios from 'axios'
-// 访问地址
-const service = axios.create({
-  // baseURL:'http://127.0.0.1:9000'
-  baseURL: import.meta.env.VITE_API_URL, // 11. 环境变量配置
-  timeout: 10000
-})
 
-// 请求拦截器--在发送请求之前做些什么
-service.interceptors.request.use(config => {
-  const token = localStorage.getItem('chen_token') // 12. 获取存储的 token
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}` // 13. 自动携带 token
-  }
-  return config
-})
-
-// 响应拦截器--在拿到数据之后做什么
-service.interceptors.response.use(
-  response => response.data, // 14. 直接返回 data 内容
-  error => {
-    if (error.response?.status === 401) { // 15. 处理 401 未授权
-      localStorage.removeItem('chen_token')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
-)
-
-export default service;
-// 在导入的时候，可以任意命名，比如import axios from './utils/axios'
 ```
 
 ```js
