@@ -2,31 +2,31 @@
 module.exports、exports 以及 require 这些都是 CommonJS 模块化规范中的内容。
 而 Node.js 是实现了 CommonJS 模块化规范，二者关系有点像 JavaScript 和 ECMAScript
 
-### 包管理工具
+### 1.包管理工具
 
-#### 概念介绍
-##### 包是什么
+#### 1.1 概念介绍
+##### 1.1.1 包是什么
 [包]英文英文单词是package，代表了一组特定功能的源码集合
 
-##### 包管理工具
-管理[包]的应用软件，可以对[包]进行下载安装、更新、删除、上传等才做  
+##### 1.1.2 包管理工具
+管理[包]的应用软件，可以对[包]进行下载安装、更新、删除、上传等操作  
 借助包管理工具，可以快速开发项目，提升开发效率  
 
-##### 常用的包管理工具
+##### 1.1.3 常用的包管理工具
 * **npm**
 * yarn
 * cnpm
 
-#### npm
+### 2. npm
 npm 全称 **Node Package Manger**，翻译为中文意思是[Node 的包管理工具]  
 npm 是 node.js官方内置的包管理工具，是**必须要掌握的工具**
 
-##### npm的安装
+#### 2.1 npm的安装
 
 node.js在安装时会 **自动安装npm**，所以如果你已经安装了node.js，可以直接使用npm  
 可以通过 `npm -v` 查看版本号测试，如果显示版本号说明安装成功，反之安装失败 
 
-##### npm基本使用
+#### 2.2 npm基本使用
 
 ###### 初始化
 创建一个空目录，然后以此目录作为工作目录启动**命令行工具**，执行 `npm init`  
@@ -40,13 +40,13 @@ node.js在安装时会 **自动安装npm**，所以如果你已经安装了node.
 > 4. `package.json` 可以手动创建和修改
 > 5. 使用 `npm init -y` 或者 `npm init --yes` 极速创建**package.json**
 
-###### 搜索包
+#### 2.3 搜索包
 
 搜索包的方式有两种
 1. 命令行 [`npm s/search 关键字`]
 2. **网站搜索** 网址是[http://www.npmjs.com/](http://www.npmjs.com/)
 
-###### 下载安装包
+#### 2.4 下载安装包
 通过 `npm install` 和 `npm i` 命令安装包
 ```npm
 <!-- 格式 -->
@@ -79,13 +79,13 @@ console.log(result);
 > 安装 uniq 之后，uniq 就是当前这个包的一个**依赖包**，有时会简称为**依赖**  
 > 比如我们创建了一个包名字为A，A中安装了包名字是B，我们就说**B是A的一个依赖包**，也会说**A依赖B**
 
-###### require 导入 npm 包的基本流程
+##### require 导入 npm 包的基本流程
 
 1. 在当前文件夹下 node_modules 中寻找同名的文件夹
 2. 在上级目录中下的 node_modules 中训中同名的文件夹，直至找到磁盘根目录
 
 
-##### 生产环境与开发环境
+#### 2.5 生产环境与开发环境
 
 开发环境是程序员 **专门用来写代码** 的环境，一般是指程序员的电脑，开发环境的项目一般 **只能程序员自己访问**  
 生产环境是项目**代码正式运行** 的环境，一般是指正式的服务器电脑，生产环境的项目一般 **每个客户否可以访问**  
@@ -98,18 +98,19 @@ console.log(result);
 | 生产依赖 | npm i -S uniq <br> npm i --save uniq    | -S 等效于 --save，**-S 是默认选项**<br> 包信息保存在 package.json 中 **dependencies** 属性 |
 | 开发依赖 | npm i -D less<br> npm i --save-dev less | -D 等效于 --save-dev<br> 包信息保存在package.json中 **devDependencies** 属性 |
 
-##### 全局安装
+#### 2.6 全局安装
 
 可以执行安装选项 `-g` 进行全局安装  
 `npm i -g nodemon`  
 全局安装完成之后就可以在命令行的任何位置运行 `nodemon` 命令  `nodemon ./test.js`
 该命令的作用是 **自动重启 node 应用程序**  
+
 > 说明：
 > 全局安装的命令不收工作目录位置影响
 > 可以通过 `npm root -g` 可以查看全局安装包的位置
 > **不是所有的包都适合全局安装**，只有全局类的工具才适合，可以通过[**查看包的官方文档来确定安装方式**](http://www.npmjs.com/)
 
-###### 修改windows执行策略
+#### 2.7 修改windows执行策略
 
 
 windows 默认不允许 npm 全局命令执行脚本文件，所以需要修改执行策略
@@ -119,7 +120,7 @@ windows 默认不允许 npm 全局命令执行脚本文件，所以需要修改�
 ![alt text](E:\VSProject\note_md\note\nodejs.assets\Snipaste_2025-02-20_15-21-47.png)  
 或者选择其他终端执行命令
 
-###### 环境变量Path
+#### 2.8 环境变量Path
 
 Path是操作系统的一个环境变量，可以设置一些文件夹的路径，在当前工作目录下找不到可执行文件时，就会在环境变量Path的目录中挨个的查找，如果找到则执行，如果没有找到就会报错。
 
@@ -129,7 +130,7 @@ Path是操作系统的一个环境变量，可以设置一些文件夹的路径�
 >   - **cmd 命令行**中执行 `where nodemon`
 >   - **powershell命令**执行 `get-command nodemon `
 
-##### 安装包依赖
+#### 2.9 安装包依赖
 
 在项目协作中有一个常用的命令就是 npm i,通过该命令可以依据 package.json 和 package-lock.json 的依赖声明安装项目依赖
 ```
@@ -138,7 +139,7 @@ npm install
 ```
 > node_modules文件夹大多数情况都不会存入版本库
 
-##### 安装指定版本的包
+#### 2.10 安装指定版本的包
 项目中可能会遇到版本不匹配的情况，有时就需要安装指定版本的包，可以使用下面的命令
 ```npm
 <!-- 格式 -->
@@ -146,7 +147,7 @@ npm i <包名@版本号>
 <!-- 实例 -->
 npm i jquery@1.11.2
 ```
-##### 删除依赖
+#### 2.11 删除依赖
 项目中可能需要删除某些不需要的包，可以使用下面的命令
 ```npm
 <!--局部删除-->
@@ -156,9 +157,10 @@ npm r uniq
 npm remove -g nodemon
 ```
 
-##### 配置命令别名
+#### 2.12 配置命令别名
 通过配置命令别名可以更简单的执行命令
 配置package.json中的 `scripts` 属性
+
 ```json
 {
   ...
@@ -182,14 +184,14 @@ npm remove -g nodemon
 > * `npm run` 有自动向上级目录查找的特性，跟require函数也一样
 > * 对于陌生的项目，可以通过查看scripts 属性来参考项目的一些操作
 
-#### cnpm
+### 3.cnpm
 
-##### cnpm 介绍
+#### 3.1 cnpm 介绍
 cnpm（China Node Package Manager） 是一个淘宝构建的 `npmjs.com` 的完整镜像，也称为[淘宝镜像],网址[http://npmmirror.com/](http://npmmirror.com/)  
 cnpm 服务部署在国内 **阿里云服务器上**，可以提高包的下载速度  
 官方也提供了一个全部工具包cnpm，操作命令与npm大体相同
 
-##### cnpm安装
+#### 3.2 cnpm安装
 
 我们可以通过 npm 来安装cnpm 工具  
 ```
@@ -199,7 +201,7 @@ npm install -g cnpm --registry=https://registry.npmmirror.com
 ```
 cnpm -v
 ```
-##### 操作命令
+#### 3.3 操作命令
 |功能|命令|
 |:-|:-|
 |初始化|cnpm init |
@@ -207,18 +209,18 @@ cnpm -v
 |安装项目依赖|cnpm i|
 |删除|cnpm r uniq|
 
-##### npm 配置淘宝镜像
+#### 3.4 npm 配置淘宝镜像
 用 npm 也可以使用淘宝镜像，配置的方式有两种
 * 直接配置
 * 工具配置
 
-###### 直接配置
+##### 3.4.1 直接配置
 执行如下命令即可完成配置  
 ```
 npm config set registry https://registry.npmmirror.com/
 ```
 
-###### 工具配置
+##### 3.4.2 工具配置
 使用 `nrm` （npm registry maneger）配置 npm 的镜像地址 
 1. 安装 nrm  
     ```
@@ -240,7 +242,7 @@ npm config set registry https://registry.npmmirror.com/
 > 3. 通过 `nrm ls` 可以查看当前配置的所有镜像源
 
 
-#### yarn
+### 4.yarn
 ##### yarn介绍
 
 yarn 是由 Facebook 在2016 年推出的心得 Javascript 包管理工具，官方网址: [https://yarnpkg.com/](https://yarnpkg.com/)
@@ -285,7 +287,7 @@ yarn config set registry https://registry.npmmirror.com/
     
 > **包管理工具不要混着用！！**
 
-#### 管理发布包
+### 5. 管理发布包
 
 ##### 创建与发布
 我们可以将自己开发的工具包发布到 npm 服务上，方便自己和其他开发者使用，操作步骤如下：
@@ -335,7 +337,7 @@ yarn config set registry https://registry.npmmirror.com/
 | MacOS    | homebrew   | https://brew.sh/                   |
 | Windows  | chocolatey | https://chocolatey.org/            |
 
-#### nvm
+### 6. nvm
 ##### 介绍
 nvm 全称 **Node Version Manager** 顾名思义它是用来管理 node 版本的工具，方便切换不同版本的Node.js
 ##### 使用
