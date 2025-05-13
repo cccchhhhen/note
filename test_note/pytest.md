@@ -1,8 +1,22 @@
 ## 一、安装
 
-`pip install -U pytest`
+`pip install -U pytest` （U最新版）
 
 验证 `pytest --version`
+
+检查本地 Chrome 版本：浏览器地址栏输入 `chrome://version`，查看版本号（如 `120.0.6099.71`）
+
+#### **常用国内镜像源**
+
+- 清华大学：`https://pypi.tuna.tsinghua.edu.cn/simple`
+
+- 阿里云：`https://mirrors.aliyun.com/pypi/simple`
+
+- 豆瓣：`https://pypi.douban.com/simple`
+
+- ```cmd
+  pip install pytest -i https://pypi.tuna.tsinghua.edu.cn/simple
+  ```
 
 #### [**pytest文档**](https://docs.pytest.org/en/latest/contents.html)
 
@@ -21,9 +35,35 @@
 
 ## 三、pytest的运行方式
 
-下载 `pip install pytest-html`
+**生成测试报告**
 
-`pytest test_0409.py --html=./report/report.html` 
+`pip install pytest-html`
+
+`pytest --html=report.html`
+
+**使用插件 `pytest-cov` 生成覆盖率报告：**
+
+`pip install pytest-cov`
+`pytest --cov=my_project`
+
+eg: `pytest test_0409.py --html=./report/report.html` 
+
+**失败重试**
+
+安装 `pytest-rerunfailures` 插件，在失败时自动重试：
+
+`pip install pytest-rerunfailures`
+`pytest --reruns 3`
+
+`pytest --version`
+
+**生成allure报告**
+
+`pip install allure-pytest`
+
+`pytest --alluredir=./allure-results`
+
+` allure serve ./allure-results`
 
 3.2 `pytest` 运行时携带的参数
 
@@ -32,6 +72,8 @@
 表示开启终端交互，其作⽤是可以让打印的内容输出显示在终端中，或者可以在终端中与⽤例中的输⼊操作进⾏交互
 
 **-v**：
+
+表示详细输出更详细的输出，包括每个测试⽤例的详细结果和其他相关信息，例如测试⽤例所在的模块、⽂件路径等
 
 test/test_lesson1.py
 
@@ -56,16 +98,30 @@ test/main.py
 ```py
 #用例执行语句：
 import pytest
-
 pytest.main(["-s"])
-
 ```
 
 控制台执行
 
 `python .\main.py`
 
-表示详细输出更详细的输出，包括每个测试⽤例的详细结果和其他相关信息，例如测试⽤例所在的模块、⽂件路径等
+或者直接 `pytest`
+
+**问题：**直接通过 `pytest` 可能找不到目录
+
+**解决：**①添加 `__init__.py` 空文件
+
+②创建`pytest`配置文件
+
+```ini
+# 创建 pytest.ini 文件
+[pytest]
+pythonpath = .
+# 或当使用src目录结构时
+pythonpath = src/
+```
+
+
 除了用main文件运行用例，还可以在Terminal终端用命令来执行用例：
 
 ```py
@@ -223,21 +279,21 @@ ps：
 
 Pytest的标签功能基于装饰器来实现。
 
-可以使⽤ @pytest.mark 装饰器为测试函数或测试类添加标签。
+可以使⽤ `@pytest.mark` 装饰器为测试函数或测试类添加标签。
 
 常⻅的⽤法是在测试函数或测试类上⽅添加装饰器，并指定相应的标签。
 
 mark后不同关键字的含义：
 
-@pytest.mark.skip：标记测试函数为跳过测试，并提供跳过的原因。这在你想要暂时跳过某些测试的情况下很有用，比如某个功能尚未实现或者有缺陷需要修复。
+`@pytest.mark.skip`：标记测试函数为跳过测试，并提供跳过的原因。这在你想要暂时跳过某些测试的情况下很有用，比如某个功能尚未实现或者有缺陷需要修复。
 
-@pytest.mark.xfail：标记预期失败的测试。这表示你预期该测试会失败，但你想要运行它并收集结果。你可以提供失败的原因。
+`@pytest.mark.xfail`：标记预期失败的测试。这表示你预期该测试会失败，但你想要运行它并收集结果。你可以提供失败的原因。
 
-@`pytest.mark.parametrize`：使用参数化标记来标记测试函数，并提供参数化的值。这样测试函数将会根据提供的参数值运行多次，每次运行时使用不同的参数值。
+`@pytest.mark.parametrize`：使用参数化标记来标记测试函数，并提供参数化的值。这样测试函数将会根据提供的参数值运行多次，每次运行时使用不同的参数值。
 
-@pytest.mark.smoke：通常用于标记快速运行、覆盖基本功能、且对整体系统影响较小的测试。Smoke 测试旨在快速验证系统的基本功能是否正常，通常在每次代码提交后都会运行，以便快速发现潜在的问题。
+`@pytest.mark.smoke`：通常用于标记快速运行、覆盖基本功能、且对整体系统影响较小的测试。Smoke 测试旨在快速验证系统的基本功能是否正常，通常在每次代码提交后都会运行，以便快速发现潜在的问题。
 
-@pytest.mark.slow： 通常用于标记运行较慢、覆盖范围较广、对整体系统影响较大的测试。Slow 测试可能包括集成测试、端到端测试、性能测试等，需要更长的时间来执行。
+`@pytest.mark.slow`： 通常用于标记运行较慢、覆盖范围较广、对整体系统影响较大的测试。Slow 测试可能包括集成测试、端到端测试、性能测试等，需要更长的时间来执行。
 
 **自定义标签：**
 
@@ -290,7 +346,7 @@ pytest.main(["-vs", "-m", "smoke"])   # main文件的写法
         终端：-->> pytest -m 'hailey or smoke' -vs
 和：pytest.main(["-vs", "-m", "hailey and smoke"])  
         终端：-->> pytest -m 'hailey and smoke' -vs
-    同时打两个标签的，如
+    同时打有两个标签的，如
     @pytest.mark.smoke
     @pytest.mark.hailey
 ```
@@ -318,6 +374,32 @@ conftest.py 是⼀个特殊的⽂件，⽤于管理测试⽤例中 需要通⽤�
 ​    ● yield：每个测试函数都会调⽤⼀次 fixture(与后置一样)
 
 ❷ **params** ：参数化 fixture，可以根据不同的参数值⽣成多个独⽴的 fixture 实例。 可以传递⼀个可迭代对象，每个元素都会作为参数值调⽤ fixture。
+
+参数化夹具（使用`params` 和 `request`）
+
+```py
+import pytest
+
+
+@pytest.fixture(params=[1, 2, 3])
+def param_fixture(request):
+    return request.param # 不可以使用其他属性名 如request.data
+
+def test_param_fixture(param_fixture):
+    assert param_fixture in [1, 2, 3]
+```
+
+**总结：**params 和 request 是 pytest 框架的固定设计，用于实现夹具的参数化
+
+**对比：**参数化测试函数（使用 @pytest.mark.parametrize）
+
+```py
+@pytest.mark.parametrize("value", [1, 2, 3])
+def test_example(value):
+    assert value > 0
+```
+
+
 
 ❸ **autouse** ：⾃动使⽤ fixture，⽆需在测试函数中显式声明使⽤该 fixture。可以 设置为 True 或 False 。
 
