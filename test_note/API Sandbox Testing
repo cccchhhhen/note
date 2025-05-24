@@ -279,9 +279,146 @@ def test_concurrent_performance():
 
 
 
+### 改进方案：使用Locust进行专业压测
+
+在项目根目录新建 `locustfiles/reqres_stress_test.py`
+
+```py
+# locustfiles/reqres_stress_test.py
+import time
+import random
+
+from locust import HttpUser, task, between
+headers = {
+    "x-api-key": "reqres-free-v1"
+}
+
+class ReqresUser(HttpUser):
+    wait_time = between(0.5, 2.5)
+
+    # 初始化时保存原始 wait_time
+    def __init__(self, *args,  ** kwargs):
+        super().__init__(*args, ** kwargs)
+        self.original_wait_time = self.wait_time  # 保存原始配置
+
+    def on_start(self):
+        self.user_id = None
+
+    # 修复所有需要验证的请求
+    @task(3)
+    def list_users(self):
+        with self.client.get("/api/users?page=2", name="[GET] List Users", catch_response=True, headers=headers) as response:
+            self._validate_response(response)
+
+    @task(2)
+    def create_user(self):
+        payload = {"name": "morpheus", "job": "leader"}
+        with self.client.post("/api/users", json=payload, name="[POST] Create User", catch_response=True, headers=headers) as response:
+            self._validate_response(response)
+            if response.status_code == 201:
+                self.user_id = response.json().get("id")
+
+    @task(1)
+    def update_user(self):
+        if self.user_id:
+            payload = {"name": "neo", "job": "matrix resident"}
+            with self.client.put(f"/api/users/{self.user_id}", json=payload, name="[PUT] Update User",
+                                 catch_response=True, headers=headers) as response:
+                self._validate_response(response)
+
+    @task(1)
+    def delayed_request(self):
+        with self.client.get("/api/users?delay=1", name="[GET] Delayed Request", catch_response=True, headers=headers) as response:
+            self._validate_response(response)
+
+    @task(1)
+    def delete_user(self):
+        if self.user_id:
+            with self.client.delete(f"/api/users/{self.user_id}", name="[DELETE] Remove User",
+                                    catch_response=True, headers=headers) as response:
+                self._validate_response(response)
+
+    # 在验证逻辑中添加重试机制
+    def _validate_response(self, response):
+        max_retries = 3
+        for attempt in range(1, max_retries + 1):
+            if 200 <= response.status_code < 300:
+                response.success()
+                return
+            elif response.status_code == 429:
+                self.wait_time = lambda instance: random.uniform(5, 10)
+                time.sleep(5)
+            else:
+                break
+            # 恢复原始配置
+            self.wait_time = self.original_wait_time
+        # 最终失败处理
+        response.failure(f"Final Error: {response.status_code}")
+```
+
+#### **关键参数解析**
+
+|         参数          |                             作用                             |
+| :-------------------: | :----------------------------------------------------------: |
+| `catch_response=True` | 启用响应捕获模式，允许手动标记请求状态（必须与`with`语句配合使用） |
+|  `name="[GET] ..."`   |                在报告中聚合相同名称的请求统计                |
+|    `json=payload`     |     自动设置`Content-Type: application/json`并序列化数据     |
+
+### **测试场景设计**
+
+#### **场景覆盖率**
+
+| 测试类型 |        对应API         |          验证点          |
+| :------: | :--------------------: | :----------------------: |
+| 数据查询 | GET /api/users?page=2  |       分页查询性能       |
+| 数据创建 |    POST /api/users     |       写操作吞吐量       |
+| 数据更新 |  PUT /api/users/{id}   |   状态修改时的并发控制   |
+| 延迟响应 | GET /api/users?delay=3 | 服务器长耗时请求处理能力 |
+| 数据删除 | DELETE /api/users/{id} |       资源释放效率       |
+
+### **性能指标采集**
+
+#### **关键监控指标**
+
+|       指标       |           计算公式           | 健康标准（示例） |
+| :--------------: | :--------------------------: | :--------------: |
+| **平均响应时间** |    Σ(单请求耗时)/总请求数    |     < 500ms      |
+| **95%响应时间**  |      95%的请求快于此值       |       < 1s       |
+|    **错误率**    | 失败请求数 / 总请求数 × 100% |      < 0.1%      |
+|  **RPS（QPS）**  |   成功请求数 / 测试总时长    |      ≥ 200       |
+
+**执行压力测试命令**：
+
+```cmd
+locust -f locustfiles/reqres_stress_test.py \
+  --host=https://reqres.in \
+  --users=100 \          # 最大并发用户数
+  --spawn-rate=10 \      # 每秒新增用户数
+  --run-time=5m \        # 测试持续时间 (5分钟)
+  --headless \           # 无界面模式 (适合CI/CD)
+  --csv=reports/reqres   # 生成CSV报告
+```
+
+```cmd
+locust -f locustfiles/reqres_stress_test.py --host=https://reqres.in --users=10 --spawn-rate=2 --run-time=1m --headless --csv=reports/reqres
+```
 
 
 
+报告文件
+
+reports/
+├── reqres_exceptions.csv   # 错误日志
+├── reqres_stats.csv        # 总统计
+└── reqres_stats_history.csv# 时间序列数据
+
+### **测试指标监控**
+
+通过浏览器访问实时仪表盘 (非 headless 模式)
+
+```cmd
+locust -f locustfiles/reqres_stress_test.py --host=https://reqres.in
+```
 
 
 
