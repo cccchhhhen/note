@@ -116,11 +116,13 @@ Error %  **常见原因**：
 
 
 
-## 四、认证方式
+## 四、知识点
+
+### （一）认证方式
 
 常见的认证方式有四种，分别是 **Basic**、**Digest**、**OAuth** 和 **Bearer**
 
-### 4.1.‌ **Basic Auth （HTTP Basic Authentication）**  
+#### 4.1.‌ **Basic Auth （HTTP Basic Authentication）**  
 
 **语法：**`Authorization:base64(username:password)`
 
@@ -131,7 +133,7 @@ Basic Auth‌也称为 **HTTP 基本认证**，是**最简单的认证方式**�
 3. ‌**应用场景**‌：Basic Auth适用于一些简单的、不需要高度安全性的应用场景。例如，一些小型网站或内部系统可能会使用这种认证方式来简化用户登录过程‌13。
 4. ‌**替代方案**‌：为了提升安全性，可以使用‌ **OAuth** ‌等更安全的认证方式。OAuth通过授权码流程，允许应用在用户授权后访问资源，而不需要直接存储用户的用户名和密码，从而提高了安全
 
-### 4.2.Digest Auth
+#### 4.2.Digest Auth  **摘要认证**
 
 1. **qop**：`Quality of Protection`
 
@@ -148,15 +150,41 @@ Basic Auth‌也称为 **HTTP 基本认证**，是**最简单的认证方式**�
 | **`auth-int`** | 验证身份的同时，对请求内容（如请求体）进行哈希计算，保护数据完整性。 |
 |    **空值**    |         不使用 `qop`（兼容旧版本协议，安全性较低）。         |
 
-3. 
+3. nonce="MOSQZ0itBAA=44abb6784cc9cbfc605a5b0893d36f23de95fcff"，
+
+   algorithm=MD5,
+
+   qop="auth",
+
+   nc=00000001,
+
+   cnonce="082c875dcb2ca740"
+
+   username = guest
+
+   password = guest
+
+   realm = DIGEST
+
+   HA1 = MD5(username:realm:pasword) = (guest:DIGEST:guest) = D00452ECC5A7576AB95C0CE19F897F82
+
+   HA2 = MD5(method:uri) = (get:/digest/) = 56F5C7BF8CE8C69E9493584E41989888
+
+   response = MD5(HA1:nonce:nc:cnonce:qop:HA2) = (D00452ECC5A7576AB95C0CE19F897F82:MOSQZ0itBAA=44abb6784cc9cbfc605a5b0893d36f23de95fcff:00000001:082c875dcb2ca740:auth:56F5C7BF8CE8C69E9493584E41989888)
 
 
+
+HA1 = MD5(username:realm:pasword) = ("guest":"DIGEST":"guest") = "854791F43D771243D854BD2FDCD0E051"
+
+HA2 = MD5(method:uri) = ("GET":"/digest/") = 6BB934FACE424000972412D972B03274
+
+response = MD5("HA1":"nonce":"nc":"cnonce":"qop":"HA2") "854791F43D771243D854BD2FDCD0E051":"MOSQZ0itBAA=44abb6784cc9cbfc605a5b0893d36f23de95fcff":00000001:"082c875dcb2ca740":auth:"6BB934FACE424000972412D972B03274") = D2712E5CA29C111838BF700D1CB50559
 
 
 
 作用
 
-### 4.3.bearer
+#### 4.3.bearer
 
 Bearer 认证，也称为**令牌认证**，是一种 HTTP 身份验证方法
 
@@ -174,17 +202,26 @@ Bearer Token 是一种无状态的、短期的、可撤销的凭证，它被设�
 
 当用户成功登录后，服务器会生成一个 Bearer Token 并返回给客户端，客户端随后在发起请求时，会在 HTTP 头部包含这个 Token。 Bearer Token 在请求头中以 Bearer 关键字加上令牌本身的形式发送，。服务器接收到请求后，会检查请求头中的 Authorization 字段，如果它以 Bearer 关键字开头，服务器就会提取出后面的令牌，并使用令牌来验证请求的合法性和授权级别，确认无误后提供请求的资源。
 
+### （二）状态码
 
+#### 1.304
+
+在HTTP协议中，304状态码（Not Modified）是一个非常常见的响应状态，它用来告诉客户端某个资源自上次请求后没有被修改过，因此可以使用本地缓存的版本。这通常发生在使用条件请求（Conditional Requests）的情况下，比如通过`If-Modified-Since`或`If-None-Match`头部。
+
+##### 解释
+
+1. **If-Modified-Since**: 客户端在请求头中包含`If-Modified-Since`字段，其值通常是一个时间戳，表示客户端缓存的资源的最后修改时间。服务器收到这个请求后，会检查资源的最后修改时间是否在这个时间戳之后。如果没有修改（即资源仍然是“未修改”的），服务器将返回304状态码，而不是重新发送整个资源。
+2. **If-None-Match**: 这个头部通常用于处理资源的版本控制。客户端提供一个或多个实体标签（Entity Tags），通常是资源的ETag值。服务器会检查这些标签与当前资源的ETag是否匹配。如果ETag匹配（即资源未更改），服务器将返回304状态码。
 
 ## 五、实操
 
-### 1.授权
+### 1.Auth
 
-Auth methods -- Basic Auth
+#### 1.1Basic Auth
 
 **问题：**通过`${__base64encode(${user}:${passwd})}`不能进行`base64`编码
 
-**解决：**添加 `JSR223 PreProcessor`
+**解决1：**添加 `JSR223 PreProcessor`
 
 ```groovy
 import java.util.Base64
@@ -196,7 +233,10 @@ def encodedAuth = Base64.getEncoder().encodeToString(authString.getBytes("UTF-8"
 vars.put("encodedAuth", encodedAuth)
 ```
 
+**解决2：**通过`HTTP Authorization Manager`
 
+| Base URL              | Username  | Password      | Mechanism |
+| --------------------- | --------- | ------------- | --------- |
+| `https://httpbin.org` | `${user}` | `${password}` | `BASIC`   |
 
-
-
+**注：**`Base URL`不能写`httpbin.org`
