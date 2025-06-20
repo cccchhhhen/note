@@ -1049,7 +1049,7 @@ add ejs engine support  ： `express -e +文件名`
 
 3. `npm i`
 
-4. package.json 中 start 运行方式改为 nodemon
+4. package.json 中 start 运行方式node 改为 nodemon
 
 5. `npm start`
 

@@ -21,17 +21,217 @@ adb命令原理：
 
 * 通过编译脚本代码生成`adb`命令操作控制手机
 
-**常用命令：**
+### **常用命令：**
 
-* 开启服务器：`adb start-server` ==>  进启动ADB服务后台进程`(Android-Debug-Bridge)`，此时，ADB服务处于运行状态，**不会主动扫描或者连接设备**
-* 关闭服务器：`adb kill-server`
-* 查看连接设备：`adb devices`
-* 进入手机终端：`adb shell`
-* 获取手机版本号：`adb shell getprop ro.build.version.release`
-* 获取手机当前启动的app和界面：`adb shell dumpsys window windows | findstr mFocusedApp`
-  * eg：`com.android.settings/.Settings`
-  * app名字：`com.android.settings`
-  * app界面名字：`.Settings`
+1. 开启服务器：`adb start-server` ==>  进启动ADB服务后台进程`(Android-Debug-Bridge)`，此时，ADB服务处于运行状态，**不会主动扫描或者连接设备**
+2. 关闭服务器：`adb kill-server`
+3. 查看连接设备：`adb devices`
+4. 进入手机终端：`adb shell`
+5. 获取手机版本号：`adb shell getprop ro.build.version.release`
+6. 获取手机当前启动的app和界面：`adb shell dumpsys window windows | findstr mFocusedApp`
+   * **注：**对于较新版本（10.0以上）通过`adb shell dumpsys window | findstr mCurrentFocus`
+     * eg：` mCurrentFocus=Window{f4c93cb u0 com.oplus.wirelesssettings/com.android.settings.SettingsActivity}`
+     * `mCurrentFocus=null
+       mCurrentFocus=Window{10ef860 u0 com.ziqing.medical/com.ziqing.medical.activitys.SearchDevicesActivity type=1}`
+       * 包名(package name)：`com.ziqing.medical `   应用程序的唯一标识符
+       * 活动名(activity name)：`com.ziqing.medical.activitys.SearchDevicesActivity`
+       * 窗口表示：`10ef860`
+       * 用户id：`u0 `    设备主用户（系统用户标识）
+       * 窗口类型：`type=1`   应用程序窗口（基础类型）
+
+     * app名字：`com.android.settings`
+     * app界面名字：`.Settings`
+7. 安装`apk`文件到设备
+
+* ```cmd
+  # 1. 开启手机USB调试（开发者选项中）
+  # 2. 连接USB并选择"文件传输"模式
+  # 3. 电脑端执行：
+  adb install -r path/to/your/app.apk # -r 表示覆盖安装
+  ```
+
+  * `adb install -r E:\apkPackage\app-release-ziqing-1.2.3.apk`
+
+  * 结果
+
+    ```cmd
+    Performing Streamed Install
+    Success
+    ```
+
+  * 安装失败，先把手机上的原app卸载掉
+
+    `adb: failed to install E:\apkPackage\app-release-ziqing-1.2.3.apk: Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package com.ziqing.medical signatures do not match newer version; ignoring!]`
+
+    手机上是1.2.2版本
+
+8. 卸载指定包名
+
+   * `adb uninstall <package>`
+
+9. 获取设备截图
+
+   * `adb shell screencap <file>`
+   * ①截图后保存在设备上：`adb shell screencap /sdcard/shootpic.png`
+   * ②将图片拉取到电脑上：`adb pull /sdcard/screenshot.png C:\Users\Administrator\Desktop\shootpic`
+   * 注：`/sdcard` 为内部存储
+
+10. 将设备文件复制到电脑
+
+   * `adb pull <from> <to>`
+
+11. 将电脑文件推送到设备
+
+    * `adb push <from> <to>`
+    * `adb push C:\Users\Administrator\Desktop\shootpic\pic1.png /sdcard/`
+
+12. 通过管道获取设备上的截图
+
+    * `adb exec-out screencap -p > <PC>`
+    * `adb exec-out screencap -p > "C:\Users\Administrator\Desktop\screenshot.png"`
+
+13. 删除设备上的文件
+
+    * `adb shell rm <file>`
+
+    * `eg: adb shell rm /sdcard/screenshot.png`
+
+14. 创建文件夹
+
+    * 创建单个文件夹：`adb shell mkdir <file>`
+    * 递归创建多级文件夹：`adb shell mkdir -p <file1/file2>`
+
+15. 查看文件
+
+    * 查看直接子目录：`adb shell ls <file>`
+    * 递归查看目录下所有内容：`adb shell ls -R <file>`
+    * 在`path`中查找`file2`：`adb shell find <path> -type d -name 'file2_name'`
+      * `-type d`：只查找**目录（directory）**类型的文件系统项
+    * 在`path`中查找直接子目录：`adb shell ls <path> | findstr <file_name>`
+      * 查找的是 `/path/` 目录下的直接子项（文件和目录名）中包含 "file_name" 的项
+
+    ```cmd
+    C:\Users\Administrator>adb shell ls /sdcard/Pictures
+    Pic
+    ScreenShot
+    
+    C:\Users\Administrator>adb shell ls -R /sdcard/Pictures
+    /sdcard/Pictures:
+    Pic
+    ScreenShot
+    
+    /sdcard/Pictures/Pic:
+    
+    /sdcard/Pictures/ScreenShot:
+    pic1.png
+    
+    C:\Users\Administrator>adb shell find /sdcard/Pictures -type d -name 'Pic1'
+    /sdcard/Pictures/Pic/Pic1
+    
+    C:\Users\Administrator>adb shell ls /sdcard/Pictures | findstr Pi
+    Pic
+    ```
+
+16. 重启设备
+
+    * `adb reboot`
+
+17. 屏幕分辨率
+
+    * `adb shell wm size`
+    * `wm：window manager`
+
+18. 屏幕密度
+
+    * `adb shell wm density`
+
+19. 显示设备信息
+
+    * `adb shell cat /proc/meminfo`
+
+20. 应用内存使用情况（总内存、空闲内存、已用内存）
+
+    * `adb shell dumpsys memoinfo <package>`
+    * `<package>`：应用程序包名
+    * `eg：adb shell dmupsys meminfo io.appium.android.apis`
+
+21. 详细内存信息
+
+    * `adb shell dumpsys meminfo`
+    * 提供详细的内存信息，包括应用程序、系统进程和缓存的内存使用情况。输出会包括各个应用程序的内存使用统计，缓存和系统进程的内存信息等
+
+22. 查看内存信息
+
+    * `adb shell free`
+    * 显示内存使用情况。包括物理内存和交换空间的总量、已使用和空闲量。
+
+23. 查看电池信息
+
+    * `adb shell dumpsys battery`
+
+24. 查看CPU信息
+
+    * `adb shell cat /proc/cpuinfo`
+
+25. 单独查看属性
+
+    * `adb shell getprop <属性>`
+    * 查看设备信号：`adb shell getprop ro.product.model`
+    * 查看`Android`版本：`adb shell getprop ro.build.version.release`
+
+26. 查看包名
+
+    * 查看第三方包名：`adb shell pm list packages -3`
+    * 查看所有包名：`adb shell pm list packages`
+    * `pm：package manager`
+
+27. 查看将要启动后者关闭的包名
+
+    * `adb shell am monitor`
+    * 输入`q`退出
+    * `am`：`activity manager`
+
+28. 关闭软件（根据包名）
+
+    * `adb shell am force-stop <package_name>`
+
+29. 导出设备内的`apk`文件
+
+    * ①使用`adb shell pm list packages [-3]`查看包名
+
+    * ②找到`apk`文件在设备上的路径：`adb shell pm path <package>`
+
+    * ③将`apk`文件导出：`adb pull <path> <PC>`
+
+    * ```cmd
+      C:\Users\Administrator>adb shell pm list packages -3
+      package:io.appium.settings
+      package:com.ziqing.medical
+      package:io.appium.uiautomator2.server
+      package:io.appium.android.apis
+      package:io.appium.uiautomator2.server.test
+      
+      C:\Users\Administrator>adb shell pm path io.appium.android.apis
+      package:/data/app/~~7o2goKAu7WJ4cqCJ0v6yEA==/io.appium.android.apis-oABXWk4y1lXUckBUcWX9Ag==/base.apk
+      
+      C:\Users\Administrator>adb pull /data/app/~~7o2goKAu7WJ4cqCJ0v6yEA==/io.appium.android.apis-oABXWk4y1lXUckBUcWX9Ag==/base.apk C:\Users\Administrator\Desktop\shootpic
+      
+      /data/app/~~7o2goKAu7WJ4cqCJ0v6yEA==/io.appium.android.apis-oABXWk4y...e.apk: 1 file pulled, 0 skipped. 52.1 MB/s (6419067 bytes in 0.117s)
+      ```
+
+30. 查看占用内存最高的3个app
+
+    * `adb shell top -m 3`
+
+31. 刷新两次，返回所有程序所占内存
+
+    * `adb shell top -n 2`
+
+32. 获取正在运行应用的`activity`
+
+    * `adb shell dumpsys package <package>`
+
+33. 
 
 **移动测试的连接操作**
 
@@ -396,3 +596,149 @@ http://www.open-open.com/lib/view/open1463526042631.html
 
 ### 5.h5的测试要点
 
+
+
+## 七、模拟机
+
+### 1.nox
+
+1.1 下载其他版本
+
+模拟器助手 --> 左侧的 多开管理 --> 右下角的 添加模拟器 按钮
+
+## 八、Appium连接模拟机
+
+#### 1.获取模拟机当前页面UI
+
+①`Appium Server GUI --> Advanced --> Allow Cors`
+
+`在Appium Inspecto`r中：
+
+- `Remote Host: 127.0.0.1`
+- `Remote Port: 4723`
+- `Remote Path: /wd/hub`
+
+②`cmd->appium --allow-cors`
+
+`在Appium Inspecto`r中：
+
+- `Remote Host: 127.0.0.1`
+- `Remote Port: 4723`
+
+```json
+{
+  "platformName": "Android",
+  "appium:platformVersion": "12",
+  "appium:deviceName": "SM-G988N",
+  "appium:appPackage": "com.android.settings",
+  "appium:appActivity": "com.android.settings.Settings",
+  "appium:automationName": "UiAutomator2",
+  "appium:udid": "127.0.0.1:62025"
+}
+```
+
+点击`Start Session`
+
+#### 2.`Appium Inspector`介绍
+
+2.1 布局
+
+* 左侧是应用程序的屏幕截图（快照视图）
+* 中间是应用程序的层次结构，表示为XML
+* 右侧是元素信息视图
+
+2.2 功能说明
+
+* `< Press Back Button` ：操作回退。Inspector窗口和手机都会同时回到上一个操作的界面
+* `○ Press Home Button`：返回主屏幕。
+* `□ Press App Switch Button`：应用切换。快速切换最近打开使用的应用程序  ？？？不成功
+* `Native App Mode`：切换为原生APP模式
+* `Web/HyBird App Mode`：切换为混合APP模式
+
+#### 3.知识点
+
+##### 2.1 元素句柄（Element Handles）
+
+1. **本质**：Appium 为页面上的每个可识别元素分配的 **唯一内部标识符**，类似于 Web 开发中的 DOM 节点引用。这个ID在当前会话中是稳定的，但每次会话会变化。
+2. 生命周期：
+   - 创建：页面加载时自动生成
+   - 销毁：元素不再可见/页面刷新时失效
+3. 特性：
+   - 仅在当前会话中有效
+   - 不可跨页面重用
+   - 不保证连续执行中的不变性
+
+**注：**句柄是动态生成的，每次启动App时都可能变化，所以**不要硬编码句柄到测试脚本中**
+
+4. 主要作用和应用场景
+
+   4.1. 调试辅助工具
+
+   - **问题定位**：快速识别哪个元素导致测试失败
+   - **对比分析**：比较相同UI在不同状态下的句柄差异
+
+
+
+Python + Appium命令行(v2.18.0)
+
+```py
+from appium import webdriver
+from appium.options.android import UiAutomator2Options
+
+def test_001():
+  options = UiAutomator2Options()
+  options.platform_name = 'Android'
+  options.platform_version = '12'
+  options.device_name = 'SM-G988N'
+  options.app_package = 'io.appium.android.apis'
+  options.app_activity = 'io.appium.android.apis.ApiDemos'
+  options.automation_name = 'UiAutomator2'
+
+  print("连接Appium服务器...")
+  driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
+  driver.implicitly_wait(10)
+  print("驱动初始化完成")
+
+
+  # 退出程序
+  driver.quit()
+
+if __name__ == '__main__':
+  test_001()
+
+```
+
+
+
+九、`app-debug.apk`
+
+[app-debug.apk](https://github.com/appium/android-apidemos)
+
+1. **准备环境**
+   - 确保已安装Android Studio和SDK
+   - 确保已配置环境变量（ANDROID_HOME，PATH中加入platform-tools和tools目录）
+   - 安装最新版Node.js（用于构建脚本，但非必须，因为也可以直接用Android Studio构建）
+2. **项目结构**
+   - 下载的项目应该包含以下关键文件：
+     - `settings.gradle` 和 `build.gradle` (项目级)
+     - 各个模块的`build.gradle` (例如app模块)
+     - `gradlew` 和 `gradlew.bat` (Gradle包装器)
+     - 可能包含一个`scripts`目录，里面有构建脚本
+3. **构建APK的方法**：使用Gradle命令行
+
+​	`gradlew.bat assembleDebug`
+
+4. 构建卡住了 `ctrl+c`
+
+**原因分析：**
+
+1. **构建进程卡住**：可能是Gradle守护进程挂起
+2. **资源不足**：内存或CPU资源耗尽
+3. **网络阻塞**：依赖下载卡住
+4. **死锁问题**：并发构建冲突
+
+`gradlew.bat --stop`
+
+`gradlew.bat assembleDebug --no-daemon`
+
+构建成功后，在`app/build/outputs/apk/debug/`目录下会生成`app-debug.apk`

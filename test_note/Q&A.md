@@ -208,46 +208,136 @@ set集合**不能被切片也不能被索引**，除了做集合运算之外，�
 
   
 
-  ##### 1.6字典
+  ##### 1. 6字典
 
   字典是一种元素为**key-value**映射类型（即**键值对映射**，其它变成语言中的Map集合）。
-  字典的**key（键）**必须为**不可变**类型，且**不能重复**，如果键重复、则最后的一个键值对会替换前面的键值对。
-  值可以取任何数据类型。键必须是不可变的，如字符串，数字或元组等，用列表就不行。
+  **key（键）**必须为**不可变**类型(如字符串，数字或元组等，用列表就不行)，且**不能重复**，如果键重复、则最后的一个键值对会替换前面的键值对。
+  值可以取任何数据类型。
   字典是**不排序**的，所以不能像列表那样切片。如果访问字典中不存在的键，将导致 `KeyError` 出错信息。
   **创建空字典使用 {}**
 
   * **字典的定义**
 
+    * **创建空字典**  `dic = {}`
+  
+    * **{}+直接赋值** `stu = {'stu1': 'tree', 'stu2': 'flower'}`
+  
+	  * **{}+字典推导式** ` d = {x: x**2 for x in range(3)}`
+  
+    *  **`dict` + 关键字参数**  `d = dict(a=1, b=2)`
+  
+    *  **`dict` + 元组列表**  `d = dict([('a', 1), ('b', 2)])` 
+  
+    * **`dict`+`zip`**   前一个作为键，后一个作为值
+  
+      ```py
+      keys = ['a', 'b', 'c']
+      val = [1, 2, 3]
+      d = dict(zip(keys, val))
+      ```
+  
+    * **`dict`+`fromkeys()`方法**
+  
+      > 初始化字典，设置value的默认值
+  
+      ```py
+      d = dict.fromkeys("abc", None) #{'a': None, 'b': None, 'c': None}
+      ```
+  
+      
+  
+  * **`keys()`**   返回字典所有键
+  
+    `dict.keys() ` 
+  
+  * **`dict.values()`**   返回字典所有值
+  
+  * **`len(dict)`**   返回字典的长度
+  
+  * **`setdefault()`**   
+  
+    > 如果键不存在于字典中，则将其添加，并将值设置为提供的默认值。如果键已经存在，则不对该键做任何修改
+  
     ```py
-    dic = {} # 创建空字典
-    stu = {'stu1': 'tree', 'stu2': 'flower'}
-    print(stu['stu1'])  # tree
-    print(stu.keys())  # dict_keys(['stu1', 'stu2'])
-    print(stu.values())  # dict_values(['tree', 'flower']) 
-    print(len(stu))  # 2
+    d = {'a':1, 'b':2}
+    d.setdefault('c', 6)
+    d.setdefault('a', 3) 
+    print(d) #{'a': 1, 'b': 2, 'c': 6}
     ```
-
-  * **字典的遍历**  `dict.items()`
-
+  
+  * **`copy()`**
+  
+    > 返回字典的浅拷贝，拷贝后的字典不会影响原字典
+  
+    ```py
+    d = {'a':1, 'b':2}
+    e = d.copy()
+    e['a'] = 3
+    print(d)  # {'a': 1, 'b': 2}
+    ```
+  
+    ```py
+    d = {'a':1, 'b':2}
+    e = d
+    e['a'] = 3
+    print(d)  # {'a': 3, 'b': 2}
+    ```
+  
+    
+  
+  * **字典的访问**
+  
+    * **中括号[ ]**    `dict["key"]`
+  
+      * **使用get()方法** `dict.get(key[, default])`
+  
+        ```py
+        stu.get('stu1')
+        ```
+  
+  
+      * **区别：**
+  
+        `get()`方法可以用来获取字典中键对应的值，如果键不存在，则返回`None`或者可以指定一个默认值
+  
+        通过key访问，若key值不存在会报错`KeyError`
+  
+  
+  * **使用`in`关键字检查键是否存在**
+  
+  * **字典的遍历**  `dict.items()`  返回键值对的元组列表
+  
     ```py
     for k, v in stu.items():
         print(k, v)
     ```
-
+  
   * **字典的操作**
-
+  
     * **更新/修改字典**   `stu['stu3'] = 'wind'`
-
+  
+    * **更新/合并字典`update`**  
+  
+      * **更新**  **关键字参数**`dict.update({key:value})`  **元组列表**`dict.update(key=value)` 
+  
+        注：存在则为更新，不存在则为添加
+  
+      * **合并**  `dict.update(dict1)`
+  
     * **删除字典元素**   `del stu['stu1']`
-
+  
     * **删除字典**   `del stu`  不可再访问`stu`
-
+  
+    * **删除`pop()`**  返回键对应的值 `dict.pop(key)`
+  
     * **计算元素（键）总数**   `len()`
-
+  
     * **转换成字符串**   `str(dict)`
-
+  
     * **判断数据类型**   `type(elem)`
-
+  
+    * **清空字典** `clear()`
+    
       
 
 #### 2.库
@@ -271,6 +361,179 @@ set集合**不能被切片也不能被索引**，除了做集合运算之外，�
    - `openpyxl`：读写`Excel`测试用例  
    - `logging`：管理测试脚本的日志记录  
    - `json`/`re`：处理`API`响应及数据清洗
+
+#### 3.题目
+
+##### 3.1字符串逆序
+
+* `切片[::-1]`<=>`[len(s) - 1 : : -1]`<=> `[-1::-1]` ：简洁高效，相当于**浅拷贝**，返回一个新的反转后的序列，原序列不变
+
+  **底层机制**：Python解释器在遇到`[::-1]`时，会从序列的最后一个元素开始，以步长-1（即每次向前移动一个）遍历整个序列，然后将这些元素组合成一个新的序列
+
+* `reversed+join`
+
+  > `reversed()` 函数返回一个逆序的迭代器，然后使用 `join()` 将其拼接成字符串
+
+  `s=''.join(reversed(s))`
+
+##### 3.2.将一个列表的每个数乘以2
+
+* 列表推导式
+
+  `li = [x*2 for x in li]`
+
+* `map()函数`+`lambda表达式`
+
+  `li = list(map(lambda x: x*2, li))`
+
+* for**循环原地修改**
+
+  ```py
+  for x in range(len(li)):
+      li[x] *= 2
+  ```
+
+##### 3.3 二叉树遍历
+
+###### 1.中序遍历
+
+```py
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def inorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+        if not root:
+            return []
+        return self.inorderTraversal(root.left) + [root.val] + self.inorderTraversal(root.right)
+    
+# 递归
+# 时间复杂度：O(n)，n为节点数，访问每个节点恰好一次。
+# 空间复杂度：空间复杂度：O(h)，h为树的高度。最坏情况下需要空间O(n)，平均情况为O(logn)
+```
+
+**通用做法**(中序遍历)
+
+```py
+class Solution:
+    def inorderTraversal(self, root: Optional[TreeNode]) -> List[int]:
+        def inorder(cur):
+            if not cur:
+                return
+            # 中序遍历
+            inorder(cur.left)
+            res.append(cur.val)
+            inorder(cur.right)
+        res = []
+        inorder(root)
+        return res
+```
+
+###### 2.层序遍历
+
+```py
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def levelOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        storeNode = []  # storeNode = collections.deque()
+        res = []
+        if root:
+            storeNode.append(root)
+        while storeNode:
+            l = len(storeNode)
+            cur = []
+            for _ in range(l):
+                node = storeNode.pop(0) # node = storeNode.popleft(0) 双端队列好像没有更快？
+                cur.append(node.val)
+                if node.left:
+                    storeNode.append(node.left)
+
+                if node.right:
+                    storeNode.append(node.right)
+            if len(cur):
+                    res.append(cur)
+        return res
+   
+"""
+输入
+root = [3,9,20,null,null,15,7]
+输出
+[[3],[9,20],[15,7]]
+"""
+```
+
+
+
+#### 5.函数式编程
+
+##### 5.1 map()
+
+基本语法：`map(function,iterable1, iterable2, ...)`
+
+* `function` 参数表示要传入一个函数，其可以是内置函数、自定义函数或者 lambda 匿名函数
+* `iterable` 表示一个或多个可迭代对象，可以是**列表**、**字符串**等
+
+**注意：**注意，该函数返回的是一个 map 对象，不能直接输出，可以通过 for 循环或者 list() 函数来显示
+
+【例】对列表的每个元素乘以2
+
+```py
+li = [1, 2, 3, 4, 5]
+li = list(map(lambda x:x*2, li))  #[2, 4, 6, 8, 10]
+```
+
+【例】传入多个可迭代对象作文参数
+
+```py
+li1 = [1, 2, 3, 4, 5]
+li2 = [2,4,6,8,10]
+li = list(map(lambda x,y:x+y, li1, li2)) #[3, 6, 9, 12, 15]
+```
+
+**注意:**由于 map() 函数是直接由用 C 语言写的，运行时不需要通过 Python 解释器间接调用，并且内部做了诸多优化，所以相比其他方法，此方法的运行效率最高
+
+##### 5.2 filter()
+
+基本语法：`filter(function,iterable)`
+
+* `funcition` 参数表示要传入一个函数
+* `iterable` 表示一个可迭代对象
+
+> filter() 函数的功能是对 `iterable` 中的每个元素，都使用 function 函数判断，并返回 True 或者 False，最后将返回 True 的元素组成一个新的可遍历的集合
+
+【例】返回一个列表中所有的偶数
+
+```py
+li = [1, 2, 3, 4, 5, 6]
+li = list(filter(lambda x: x%2==0, li)) #[2, 4, 6]
+```
+
+##### 5.3 reduce()
+
+基本语法：`reduce(function, iterable)`
+
+* `function` 规定必须是一个包含 2 个参数的函数
+* `iterable` 表示可迭代对象
+
+> reduce() 函数通常用来对一个集合做一些累积操作
+
+【例】计算某个列表元素的乘积
+
+```py
+from functools import reduce
+
+listDemo = [1, 2, 3, 4, 5]
+listDemo = reduce(lambda x,y: x*y, listDemo)  # 120
+```
+
+
 
 ### 二、操作系统
 

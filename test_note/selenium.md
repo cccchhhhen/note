@@ -1,3 +1,5 @@
+## 一、安装
+
 `pip install selenium`
 
 `pip show selenium`
@@ -8,7 +10,7 @@
 * `https://parabank.parasoft.com/`  银行系统模拟（登录、转账等）
 * `https://automationexercise.com/`  商城（购物）
 
-一、例子
+## 二、例子
 
 1.页面加载时间
 
@@ -114,3 +116,107 @@ class LoginPage:
 
 
 
+## 三、知识点
+
+#### 3.1 元素定位
+
+```py
+from selenium.webdriver.common.by import By
+```
+
+**八大元素定位：**
+
+`find_element(By.<策略>, "值")`
+
+| 定位方式            | 语法                                                      | 说明                                      |
+| ------------------- | --------------------------------------------------------- | ----------------------------------------- |
+| `ID`                | `find_element(By.ID, "id_value")`                         |                                           |
+| `name`              | `find_element(By.NAME, "name_value")`                     |                                           |
+| `Class Name`        | `find_element(By.CLASS_NAME, "class_name")`               |                                           |
+| `Tag Name`          | `find_element(By.TAG_NAME, "tag_name")`                   |                                           |
+| `CSS`选择器         | `find_element(By.CSS_SELECTOR, "css_selector")`           |                                           |
+| `XPath`             | `find_element(By.XPATH, "xpath_expression")`              |                                           |
+| ` Link Text`        | `find_element(By.LINK_TEXT, "link_text")`                 | 通过链接的文本内容定位（适用于 <a> 标签） |
+| `Partial Link Text` | `find_element(By.PARTIAL_LINK_TEXT, "partial_link_text")` | 通过链接的部分文本内容定位                |
+
+注：`find_element_by_id`是旧方法
+
+| `find_element_by_id` 适合 | `find_element(By.ID, ...)` 适合 |
+| ------------------------- | ------------------------------- |
+| 旧项目维护                | 新项目开发                      |
+| 简单脚本开发              | Page Object 模式                |
+| 教学示例 (展现直观性)     | 参数化定位器                    |
+|                           | 自定义查找器扩展                |
+
+##### 3.1.1 `XPath`
+
+**注意：**`xpath`的定位 同一级别的多个标签索引从1开始
+
+###### 1.标签属性定位
+
+①**绝对路径：**用一个斜杠'/'
+
+**last()**方法：当标签存在多个相同的时候，定位到最后一个；last() - 1 定位倒数第二个
+
+eg：
+
+```js
+html/body/div/div/div[2]/div/div/div/form/div[last()-1]
+```
+
+
+
+②**相对路径：**以 '//' 开头
+
+* `//标签名[index]`：`//input[1]`，[1]可省略，为什么[2]、[3]不行？
+
+* 标签属性定位：`//标签名[@属性="属性值"]`
+
+  * `name, class, type, id`都行,
+
+  * `//input[@type='submit']`
+
+  * 属性组合
+
+    * `//标签名[@属性1="属性值1" and @属性2="属性值2"]`
+    * `//input[@class="input_error form_input error" and @type="password"]`
+    * 或者 `//input[contains(@class, 'form_input') and @type='password']`
+
+  * 当标签元素少，但标签中间有文本可以定位
+
+    * ```html
+      <h4>Accepted usernames are:</h4>
+      //h4[contains(text(), "Accepted")]
+      ```
+
+    * 有多个类名
+
+    * 属性值太长，可通过模糊定位
+
+      * `//a[contains(@href, "fonts")]`
+
+  * 动态属性定位
+
+    * `contains()`
+    * `srarts-with`
+      * `//input[starts-with(@id, 'login')]`
+    * `ends-with`
+      * **注：**`ends-with`是`XPath`2.0的，大部分浏览器可能不支持
+
+
+
+③`//` 和 `.//` 的区别
+
+`//` 是指从全文上下文中搜索//后面的节点，而 `.//` 则是指从前面的节点的子节点中进行查找
+
+④选取若干路径 `|`
+
+作用：匹配多个不同条件的元素
+
+`//input[@type='text'] | //input[@type='password']`
+
+###### 2.节点文本定位
+
+* `text()`：`//div[@id="s-hotsearch-wrapper"]/ul/li[3]/a/span[contains(string(), '机器人')]`
+* `string()`：`//div[@id="s-hotsearch-wrapper"]/ul/li[3]/a[contains(string(), '机器人')]`
+* 区别：text() : 当前元素下的文本；string()：当前元素所有文本和子元素文本（字符串列表）
