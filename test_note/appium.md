@@ -1,5 +1,7 @@
 ## 一、安装
 
+[appium](https://www.kancloud.cn/testerhome/appium_docs_cn)
+
 pycharm
 
 `pip install Appium-Python-Client==2.11.1`
@@ -742,3 +744,59 @@ if __name__ == '__main__':
 `gradlew.bat assembleDebug --no-daemon`
 
 构建成功后，在`app/build/outputs/apk/debug/`目录下会生成`app-debug.apk`
+
+## 九、操作
+
+1. 页面
+
+* 获取页面标题`activity`：`driver.current_activity()`
+
+* ```py
+  elem = self.driver_.find_element(AppiumBy.XPATH, '//android.widget.TextView[@content-desc="Animation"]')
+  # 元素的类型（Android/iOS控件的类名）
+  print(elem.tag_name)
+  # 元素的可视文本内容
+  print(elem.text)
+  # 元素是否可见 bool
+  print(elem.is_displayed()) 
+  # 元素是否可用（可点击/可输入） bool
+  print(elem.is_enabled() )
+  # 元素是否被选中（复选框/单选框） bool
+  print(elem.is_selected())
+  # 获取元素的位置（坐标）
+  element.location        # 返回: {'x': 100, 'y': 200}
+  
+  # 获取元素的尺寸
+  element.size            # 返回: {'width': 300, 'height': 50}
+  
+  # 获取元素的边界矩形
+  element.rect            # 返回: {'x': 100, 'y': 200, 'width': 300, 'height': 50}
+  
+  
+  # 获取元素的resource-id（Android特有）
+  element.get_attribute("resource-id")  # 返回: 'com.example:id/title'
+  
+  # 获取元素的content-desc（等同于Accessibility ID）
+  element.get_attribute("content-desc")  # 返回: 'welcome_message'
+  
+  # 获取checked状态（复选框/开关）
+  element.get_attribute("checked")       # 返回: 'true' 或 'false'
+  
+  # 获取元素类的完整信息
+  element.get_attribute("class")         # 返回: 'android.widget.TextView'
+  
+  # 横竖屏
+  driver_.orientation  # 返回：PORTRAIT：竖屏；LANDSCAPE：横屏
+  driver_.orientation = "LANDSCAPE" #设置为横屏
+  ```
+
+* 启动多窗口支持
+
+  * ```json
+    {
+      "appium:ignoreHiddenApiPolicyError": true,
+      "appium:enableMultiWindows": true
+    }
+    ```
+
+  * `appiun inspector`可以打开`element handles`捕捉多窗口
