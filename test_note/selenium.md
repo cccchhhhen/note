@@ -220,3 +220,64 @@ html/body/div/div/div[2]/div/div/div/form/div[last()-1]
 * `text()`：`//div[@id="s-hotsearch-wrapper"]/ul/li[3]/a/span[contains(string(), '机器人')]`
 * `string()`：`//div[@id="s-hotsearch-wrapper"]/ul/li[3]/a[contains(string(), '机器人')]`
 * 区别：text() : 当前元素下的文本；string()：当前元素所有文本和子元素文本（字符串列表）
+
+## 四、网站
+
+[demoqa](https://demoqa.com/text-box)
+
+### 1.radio button
+
+编写测试用例：
+测试用例1：验证初始状态
+
+- 所有单选按钮都未选中（除了默认可能没有选中的，这里默认都没有选中）
+
+- No按钮是禁用的
+
+- ```py
+  button.is_selected()  # 检验按钮是否被选中
+  result_message.is_displayed()  # 检验消息是否有提示
+  ```
+
+测试用例2：选择“Yes”
+
+- 点击“Yes”单选按钮
+
+- 验证“Yes”被选中
+
+- 验证其他按钮没有被选中
+
+- 验证显示结果文本为“You have selected Yes”
+
+- ```py
+  # 切换回未选中状态(刷新)
+  driver.refresh()
+  ```
+
+测试用例3：选择“Impressive”
+
+- 点击“Impressive”
+- 验证“Impressive”被选中
+- 验证其他按钮（除No）没有被选中
+- 验证结果文本变为“You have selected Impressive”
+
+测试用例4：尝试选择“No”
+
+- 验证“No”按钮是禁用的，无法点击。
+
+- ```py
+  assert no_radio.get_attribute("disabled") == "true", "No选项未被禁用"
+  ```
+
+测试用例5：切换选择（先Yes，再Impressive）
+
+- 先选择Yes
+- 再选择Impressive
+- 验证Yes已取消，Impressive被选中
+
+实现注意事项：
+
+- 使用XPath或CSS选择器定位元素。
+- 对于不可用的按钮，使用is_enabled()方法判断。
+- 单选按钮的选中状态使用is_selected()方法。
+- 结果文本显示在一个div（id='result'）中，需要等待其出现（如果动态显示）。
