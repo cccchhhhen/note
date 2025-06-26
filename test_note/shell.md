@@ -247,6 +247,229 @@ fi
 
      > 注：`echo "${#array}"`是返回数组第一个元素的长度
 
+7. `expr`命令
+
+   * `expr表达式`命令用于求表达式的值
+
+     > 1. 用空格隔开每一项
+     > 2. 用反斜杠放在`shell`特定的字符前面（发现表达式运行错误时，可以试试转义）
+     > 3. 对包含空格和其他特殊字符的字符串要用引号括起来
+     > 4. `expr`会在`stdout`中输出结果。如果为逻辑关系表达式，则结果为真时，`stdout`输出1，否则输出0
+     > 5. `expr`的`exit code`：如果为逻辑关系表达式，则结果为真时，`exit code`为0，否则为1
+
+   * 字符串表达式
+
+     * `length str`：返回`str`的长度
+
+     * `index xxx yyy`：`yyy`中任意单个字符在`xxx`中首次出现的位置，**下标从1开始**，如果`xxx`中找不到`yyy`中的任意字符，返回0
+
+     * `substr str index1 len`：返回`str`字符串从`index`开始，最大长度为`len`的子串。如果`index`或`len`为负数，0或非数值，则返回空字符串
+
+       ```bash
+       #!/bin/bash
+       
+       str="hello world"   
+       echo $(expr length "$str")  #  11
+       echo $(expr index "$str" "wo")  #  5
+       echo `expr substr "$str" 7 7`  #  world
+       ```
+
+   * 整数表达式
+
+     * `expr`支持普通的算术操作
+
+     *  优先级：字符串表达式 > 算术表达式 > 逻辑关系表达式
+
+       >`+ - `：加减运算。两端参数会转换为整数，如果转换失败则报错。
+       >
+       >`* / %`：乘，除，取模运算。两端参数会转换为整数，如果转换失败则报错。
+       >
+       >`()`：可以改变优先级，但需要用反斜杠转义
+
+       ```bash
+       #!/bin/bash
+       
+       a=4
+       b=3
+       
+       echo `expr $a + $b`  # 7
+       echo `expr $a - $b`  # 1
+       echo `expr $a \* $b`  # 12
+       echo `expr $a "*" $b`  # 12
+       echo `expr $a / $b`  # 1
+       echo `expr $a % $b`  # 1
+       echo $((($a+$b)*($a-$b)))  # 7
+       ```
+
+     * 逻辑关系表达式
+
+       * `| & > >= < <= = == !=`
+
+8. `read`命令
+
+   * 命令用于从标准输入中读取**单行**数据。当读到文件结束符时，`exit code`为1，否则为0
+   * `read data`：收尾的空格会被删除，去除`\`
+   * 参数：
+     * `-p`：后面接提示信息
+     * `-t`：后面跟秒数，定义输入字符的等待时间，超时等待时间后会自动忽略此命令
+     
+   * 读取多个值
+
+     `read data1 data2`输入时以空格作为分隔符
+
+   * 读入数组  `read -a array`  将空格分割的结果存入数组
+
+   * 保留整行内容：`IFS= read -r lines`
+
+     * `-r`：防止反斜杠转义（例如`\n`会被当作两个字符）（保留`\`）
+     * `IFS=`：禁用分词（`Internal Field Separator`），确保行首/行末空格不被删除 
+
+
+
+
+9. `echo`命令
+
+   * `echo`用于输出字符串
+
+   * 显示普通字符串
+
+     ```bash
+     echo hello  # hello 
+     echo "world"  # world
+     ```
+
+   * 显示转义字符
+
+     ```bash
+     echo "\"chen\""  # chen
+     echo \"chen\"  # chen
+     ```
+
+   * 显示变量
+
+   * 显示换行
+
+     ```bash
+     echo -e "hi\ndog"  # 输出两行
+     echo -e "hello \c cat" # -e 开启转义 \c 不换行，且终止后续输出
+     ```
+
+   * 定向输出
+
+     ```bash
+     echo "hello world" > output.txt   # 不存在output.txt 默认创建（以覆盖的方式）
+     ```
+
+     > tips:`help echo`查看转义
+
+### 命令
+
+1. `ls` - 列出目录内容
+
+### 题目
+
+1. `HackerRank`
+
+   > Given N lines of input, print the 3rd character from each line as a new line of output. It is guaranteed that each of the n lines of input will have a 3rd character.
+   >
+   > **Input Format**
+   >
+   > A text file containing N lines of [ASCII](https://en.wikipedia.org/wiki/ASCII) characters.
+   >
+   > **Constraints**
+   >
+   > - 1≤N≤100
+   >
+   > **Output Format**
+   >
+   > For each line of input, print its 3rd character on a new line for a total of N lines of output.
+   >
+   > **Sample Input**
+   >
+   > ```
+   > Hello
+   > World
+   > how are you
+   > ```
+   >
+   > **Sample Output**
+   >
+   > ```
+   > l
+   > r
+   > w
+   > ```
+
+解法一：
+
+```bash
+#!/bin/bash
+
+mapfile -t lines
+
+for i in "${lines[@]}";do
+        if [ ${#i} -ge 3 ];then
+            echo "${i:2:1}"
+        fi
+done
+```
+
+> **工作原理：**
+>
+> 1. **`mapfile -t lines：`**
+>
+>    * 一次性读取所有输入行（以`Ctrl+D`结束）
+>    * `-t` 选项移除行尾的换行符
+>    * 将每行内容存储在数组`lines`中
+>    * **高效处理**：
+>      - `mapfile`直接读取到数组比逐行`read`更快
+>      - 一次完成读取操作，避免循环中的多次IO
+>
+> 2. **`for line in "${lines[@]}"`**：
+>
+>    * 遍历数组中的每行内容
+>
+>    * `"${lines[@]}"` 确保正确处理包含空格的行
+>
+>      > **区分：`for line in ${lines[@]}`**
+>      >
+>      > 缺少双引号：
+>      >
+>      > * **单词分割（Word Splitting）**：当数组元素包含空格或制表符时，会分割成多个元素
+>      > * **路径扩展（Pathname Expansion）**：`输入行："*.txt"`
+>      >   - **有双引号**：`line="*.txt"`（按字面处理）
+>      >   - **无双引号**：Bash 会尝试匹配当前目录下的 `.txt` 文件
+>
+> 3. **`${line:2:1}`**：
+>
+>    - 提取字符串中索引位置为2的单个字符
+>
+> 4. **长度检查**：
+>
+>    - `[ ${#line} -ge 3 ]` 确保行至少有3个字符
+>    - 虽然题目保证每行都有第3个字符，但添加检查更健壮
+
+解法二：
+
+```bash
+#!/bin/bash
+# 使用while循环逐行处理
+while IFS= read -r line || [ -n "$line" ]; do
+    [ ${#line} -ge 3 ] && echo "${line:2:1}"
+done
+```
+
+> **安全处理**：
+>
+> - `-r` 选项防止反斜杠转义
+> - `IFS=` 保留前导/尾随空格
+> - `|| [ -n "$line" ]` 处理不以换行符结尾的行     -n : 判断是不是非空的
+>
+> **兼容性**：
+>
+> - 适用于包含空格、特殊符号和各种字符的输入行
+> - 正确处理空行（跳过长度不足3的行）
+
 ### **PUTTY**安装
 
 1 **更新系统**
