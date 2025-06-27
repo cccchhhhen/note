@@ -364,7 +364,21 @@ fi
 
 ### 命令
 
-1. `ls` - 列出目录内容
+1. `ls  (list files)` - 列出目录内容
+
+   * 显示文件属性及文件所属用户和组：
+
+     * `ll`：显示隐藏文件
+
+     * `ls -l`
+
+       ```bash
+       drwxrwxr-x  4 chen chen  4096  6月  9 11:08 practice_linux/
+       -rw-r--r--  1 chen chen   807  6月  6 14:10 .profile
+       ```
+
+       * `d`代表目录文件；`-`代表文件；`l`则表示为链接文档(link file)；
+       * `user、group、other`权限：Linux系统按文件所有者、文件所有者同组用户和其他用户来指定了不同的文件访问权限
 
 ### 题目
 
@@ -556,6 +570,47 @@ pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 5 配置文件 `config/config.yaml`
 
 
+
+### Hitchinker
+
+[Hitchinker](https://gitee.com/iwxiaot/Hitchhiker/tree/master)
+
+https://brookshi.gitbooks.io/hitchhiker/content/cn/installation/docker.html
+
+```bash
+# 安装docker，如果已经安装请忽略
+sudo apt update
+sudo apt install docker.io
+
+# 安装docker-compose，如果已经安装请忽略
+sudo apt install docker-compose
+
+# 创建一个文件夹
+mkdir hitchhiker
+cd hitchhiker
+
+sudo apt install curl
+
+# 从github上下载docker-compose.yml以及mysql.conf文件，不用vpn
+curl -O https://raw.githubusercontent.com/brookshi/Hitchhiker/release/deploy/docker/hitchhiker_and_mysql/docker-compose.yml -O https://raw.githubusercontent.com/brookshi/Hitchhiker/release/deploy/docker/hitchhiker_and_mysql/hitchhiker-mysql.cnf
+
+# 编辑 docker-compose.yml， 把localhost换成你机器的局域网ip，如果是只有本机一个人用那就localhost也可以
+sudo vim docker-compose.yml
+# 修改完成后，保存退出 (国内用户改image地址：registry.cn-hangzhou.aliyuncs.com/brook/hitchhiker-cn:v0.14， 以及写入环境变量配置hitchhiker以及mysql)
+...
+# 会出现Pulling hitchhiker-mysql (mysql:5.7)...
+# ERROR: Get "https://registry-1.docker.io/v2/": net/http: request canceled while waiting for 
+# connection (Client.Timeout exceeded while awaiting headers)
+# sudo vim docker-compose.yml修改
+mysql:
+    image: registry.cn-hangzhou.aliyuncs.com/mirror/mysql:5.7  # 阿里云镜像
+
+# 执行docker-compose up安装镜像
+sudo docker-compose up -d
+
+# 成功后可以测试下
+curl http://ip:8080/
+```
 
 
 

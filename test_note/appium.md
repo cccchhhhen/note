@@ -712,7 +712,7 @@ if __name__ == '__main__':
 
 
 
-九、`app-debug.apk`
+## 九、`app-debug.apk`
 
 [app-debug.apk](https://github.com/appium/android-apidemos)
 
@@ -745,7 +745,7 @@ if __name__ == '__main__':
 
 构建成功后，在`app/build/outputs/apk/debug/`目录下会生成`app-debug.apk`
 
-## 九、操作
+## 十、操作
 
 1. 页面
 
