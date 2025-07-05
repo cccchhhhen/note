@@ -354,12 +354,14 @@ fi
      echo -e "hello \c cat" # -e 开启转义 \c 不换行，且终止后续输出
      ```
 
-   * 定向输出
+     **注：**`-e`    解释反斜杆转义字符
 
+   * 定向输出
+   
      ```bash
      echo "hello world" > output.txt   # 不存在output.txt 默认创建（以覆盖的方式）
      ```
-
+   
      > tips:`help echo`查看转义
 
 ### 命令
@@ -368,9 +370,9 @@ fi
 
    * 显示文件属性及文件所属用户和组：
 
-     * `ll`：显示隐藏文件
+     * `ll`：显示全部文件，包括隐藏文件（包含属性）
 
-     * `ls -l`
+     * `ls -l`：列出文件（不包括隐藏文件）及属性
 
        ```bash
        drwxrwxr-x  4 chen chen  4096  6月  9 11:08 practice_linux/
@@ -379,6 +381,145 @@ fi
 
        * `d`代表目录文件；`-`代表文件；`l`则表示为链接文档(link file)；
        * `user、group、other`权限：Linux系统按文件所有者、文件所有者同组用户和其他用户来指定了不同的文件访问权限
+       
+     * `ls -a`：列出全部文件，包括隐藏文件（不含属性）
+     
+     * `ls -d`：列出目录本身，结果为`.`
+
+2. `cd（Change Directory）` - 切换目录
+
+   * `cd ..`： 返回上一级目录
+   * `cd ~`： 返回根目录
+   * `cd -`：切换到上次访问的目录并输出
+
+3. `pwd（Print Working Directory）` - 显示当前工作目录
+
+   * `pwd [-P]`：`-P`  显示出确实的路径，而非使用链接 (link) 路径
+
+4. `cp` - 复制文件或目录
+
+   * 语法：`cp [options] source dest`
+
+   * `cp [-adfilprsu] 来源档(source) 目标档(destination)`
+   * `options:`
+     * `-r` 或 `-R`：递归复制目录及其内容（用于复制目录）
+     * `-i`：交互模式，覆盖前提示用户确认
+     * `-f`：强制复制，覆盖目标文件而不提示
+     * `-v`：显示详细的复制过程（verbose）
+     * `-p`：保留文件的原始属性（如权限、时间戳等）
+     * `-a`：归档模式，等同于 `-dpR`，保留所有文件属性和递归复制目录
+     * `-u`：仅当源文件比目标文件新时才复制（更新模式）
+     * `-l`：创建硬链接而不是复制文件
+     * `-s`：创建符号链接（软链接）而不是复制文件
+
+5. `mkdir (make directory)` - 创建新目录
+
+   * `mkdir [-mp] 目录名称`
+   * `-m` ：配置文件的权限喔！直接配置，默认权限 (`umask`) 无效  `eg:mkdir -m 755 <file>`
+   * `-p `：帮助你直接将所需要的目录(包含上一级目录)递归创建起来！
+
+6. `touch` - 创建空文件或更新文件时间戳
+
+   * `touch file`
+
+7. `rm(remove)` - 命令用于删除一个文件或者目录
+
+   * 语法：`rm [options] name ...`
+   * `options:`
+     * `-i`： 删除前逐一询问确认
+     * `-f`： 即使原档案属性设为唯读，亦直接删除，无需逐一确认
+     * `-r`： 将目录及以下之档案亦逐一删除
+   * 删除当前目录下的所有文件及目录：`rm -r *`
+
+8. `rmdir(remove directory)` - 删除空目录
+
+   * `rmdir [-p] 目录名称`
+   * **-p ：**从该目录起，一次删除多级空目录
+
+9. `grep` - 搜索文本
+
+   * **基本用法：**`grep [选项] 模式 文件`
+     * `eg:`在`output.txt`中搜索`"hello"`：`grep "hello" output.txt` -> 输出包含`"hello"`的行
+     * 常见 [选项]
+       * ***`-i：`***忽略大小写
+       * ***`-v：`***反转匹配，显示不包含模式的行
+       * ***`-r：`***递归搜索`path`目录中的所有文件，若没有`path`则搜索当前目录下所有文件
+         * `grep -r "hello" /path/`
+       * ***`-l：`*** 只显示包含匹配模式的文件名
+         * `grep -l "hello" *` ，`*` 匹配当前目录下**所有非隐藏的文件名**
+         * `grep -rl --include="*.txt" "hello"`，递归匹配所有`.txt`文件
+       * ***`-n：`*** 显示匹配行的行号
+       * ***`-c：`*** 输出匹配的行数，`eg: grep -c "hello" output.txt`
+       * ***`-w：`*** 匹配整个单词，`eg: grep -w "hello" output.txt`
+       * ***`-C NUM：`***在匹配行前后各显示指定数量的行
+
+10. `locate` - 快速定位文件
+
+   * `locate file`
+   * 没查到可能要进行实时更新，`sudo updatedb`，输入密码
+
+11. **`find` - 在文件系统找查找文件**
+
+    * `find` -  列出当前目录及子目录下的所有文件，等价于`find .`，等价于`find . -print`
+    * `find file` - 搜索指定目录或路径
+    * `find /path -name file` - 通过指定目录指定名字搜索文件 `eg: find ./test -name "*.txt"`
+    * 
+
+12. `cat(concatenate)` - 查看和连接文件
+
+    * 用于连接文件并打印到标准输出设备上，它的主要作用是用于查看和连接文件
+    * 语法：`cat [options] [file]`
+    * `options：`
+      * `-n`：显示行号
+      * `-b`：对非空行显示行号
+      * `-s`：压缩连续的空行，只显示一个空行
+      * `-E / -e`：在每一行的末尾显示 `$` 符号（包括空行）
+      * `-T / -t`：将 Tab 字符显示为 `^I`
+      * `-v (visualize)`：显示一些非打印字符，例如有中文的话会显示成占位符
+    * 查看文件内容：`cat file`
+    * 创建文件：`cat > file`，存在则覆盖file文件内容
+      * `cat -n file1 > file2`，将`file1`加上行号后输出到 / 覆盖`file2`
+    * 追加内容到文件：`cat >> file`，从键盘读取追加的内容，`ctrl+d`表示结束
+      * `cat file1 >> file`，将`file1`的内容追加到`file`
+    * 连接文件：`cat file1 file2 > file3`，将`file1`和`file2`的内容合并到`file3`
+    * 显示多个文件的内容：`cat file1 file2`
+    * 使用管道：`cat file | command`，将 cat 命令的输出作为另一个命令的输入
+      * `eg: cat file | grep "hello" 输出 file 中包含 hello 的行`
+      * 动态输入处理：`cat | grep "hello" > file`，从标准输入（键盘）读取包含`hello`的字符串并输入到`file`
+      * 结合多个命令处理：`cat filename | grep "hello" | sort `，先过滤在排序（升序）
+    * 从标准输入（通常是键盘）读取内容：`cat -`，并将其输出到终端（输入一行输出一行）
+    * 查看文件最后几行：`cat file | tail -n 3`，读取最后3行
+    * 查看文件前几行：`cat file | head-n 3`，读取前3行
+    * 清空`file`文档内容：`cat /dev/null > file`
+
+13. `less` -  文件查看器
+
+    * 打开文件：`less file`
+    * 使用导航：
+      * **上下箭头键 / 换行**：逐行滚动
+      * **y 键**：向前滚动一行
+      * **空格键**：向下翻一页
+      * **b 键**：向上翻一页
+      * **g 键**：跳转到文件开头
+      * **G 键**：跳转到文件末尾
+      * **u / d**：向前 / 向后翻半页
+      * **Q 键**：退出less 命令
+    * `options:`
+      * `-N` ：选项显示行号
+      * `+ [line number]`：跳转到指定行 `history | less +100`
+      * `-b`：查看二进制文件
+      * 
+    * `ps`查看进程信息并通过`less`分页显示：`ps -ef | less`
+    * 查看命令历史使用记录并通过`less`分页显示：`history | less`
+    * 查看帮助文档：`man ls | less`
+    * 搜索文本
+      * 向前搜索：`/search-string`
+      * 向后搜索：`?search-string`
+    * 标记和跳转
+      * 设置标记：`eg :设置为a => ma`
+      * 跳转标记：`'a`
+    * 浏览多个文件
+      * `less file1 file2`  下一个文件：`:n`    上一个文件：`:p`
 
 ### 题目
 
@@ -614,3 +755,26 @@ curl http://ip:8080/
 
 
 
+[练习](https://overthewire.org/wargames/bandit/bandit0.html)
+
+bandit
+
+要么通过putty 或者 cmd 都可以
+
+cmd： ssh -p port username@host
+
+bandit1:
+
+注意文件名叫做`-`，与root是一样的，要通过'cat ./-'路径来读取内容
+
+bandit2：
+
+cat的基本操作，访问带有空格的文件名，用转义字符\来转义空格即可
+
+MNk8KNH3Usiio41PRUEoDFPqfxLPlSmx
+
+
+
+
+
+`systemctl`全称 `system control`
